@@ -6,6 +6,7 @@ using namespace std;
 
 class Kuliah {
 	friend class Problem;
+	friend ostream& operator<<(ostream&, Kuliah&);
 	public :
 		// ctor
 		Kuliah();
@@ -20,6 +21,7 @@ class Kuliah {
 		int getDuration() { return duration; }
 		string getCurrentRuang() { return currentRuang; }
 		int getCurrentStartTime() { return currentStartTime; }
+		int getCurrentDay() { return currentDay; }
 		
 		// predikat
 		bool isButuhRuang() { return (butuhRuang != "-"); }
@@ -43,6 +45,12 @@ class Kuliah {
 };
 
 int Kuliah::lastKuliahId = 0;
+
+ostream& operator<< (ostream& out, Kuliah& K) {
+	out << K.getKode() << " : " << K.getCurrentRuang() << endl;
+	out << "** Hari  : " << K.getCurrentDay() << endl;
+	out << "** Pukul : " << K.getCurrentStartTime() << " hingga " << K.getCurrentStartTime() + K.getDuration();
+}
 
 Kuliah::Kuliah() {
 	kuliahId = ++lastKuliahId;

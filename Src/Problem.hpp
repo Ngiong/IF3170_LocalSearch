@@ -17,13 +17,16 @@ class Problem {
 		void solveUsingHCA();
 		void solveUsingSA();
 		void solveUsingGA();
-		void solveUsingKocokan();
+		void solveUsingKocokan(int); // maxSteps
 		
 		// Init
 		void initByRandom();
 		void initByMikir(); /* ================== BERHARAP BANYAK DENGAN METHOD INI ==========================*/
+		// Salah satu yg bisa dipertimbangkan untuk initByMikir adalah menjadikan sebuah matrix terlebih dahulu, 
+		// lalu melakukan assignment u/ slot-slot yang hanya mungkin di occupy oleh 1 matakuliah
 		
 		// Performance Measure
+		bool isSolved();
 		
 	private :
 		int nRooms, nCourses;
@@ -66,6 +69,10 @@ Problem::~Problem() {
 	delete [] course;	
 }
 
+/*********************************************
+**				VARIABLE INITIATOR
+**
+**********************************************/
 void Problem::initByRandom() {
 	for(int i=0; i<nCourses; i++) {
 		// Set Ruangan
@@ -90,10 +97,57 @@ void Problem::initByRandom() {
 			courseEnd = course[i]->getEndTime(), 
 			courseDuration = course[i]->getDuration();
 		randomlyChosenStartTime = rnd.nextInt(courseBegin, courseEnd-courseDuration);
+		course[i]->currentStartTime = randomlyChosenStartTime;
 		// Tidak perlu di do..while karena random nya PASTI masuk di range courseBegin dan courseEnd
 		
 		// ** Bisa juga alternatifnya, set hari dan waktu bersamaan
 	}
+}
+
+/*********************************************
+**				PROBLEM SOLVER
+**
+**********************************************/
+void Problem::solveUsingKocokan(int maxSteps) {
+	initByRandom();
+	
+	int stepCounter = 0;
+	while(!isSolved() && stepCounter++ < maxSteps) {
+		// Pilih variabel yg conflict
+		int randomlySelectedVariable = rnd.nextInt(nCourses); 
+		// ** gebleknya.. krn ga kepikiran isConflictingVariable nya gimana implementasinya
+		
+		// Set ulang secara randomly
+		// ** Yg modif adalah : ruangannya, harinya
+		// ** Jam kuliah akan menyesuaikan dengan randomize
+		if(course[randomlySelectedVariable]->isButuhRuang()) { // PASTI HARINYA
+			int randomlyChosenDay;
+			do {
+				randomlyChosenDay = rnd.nextInt(1, 5);	
+			} while(!course[randomlySelectedVariable]->isDayAvail(randomlyChosenDay));
+			course[randomlySelectedVariable]->currentDay = randomlyChosenDay;
+		}
+		
+		// Measure performance
+		// *********************** Save it for later ***********************
+	}
+	// isSolved() OR stepCounter >= maxSteps
+	if(stepCounter < maxSteps) cout << "YAY" << endl;
+	else cout << "NAH" << endl;
+	
+	for(int i=0; i<nCourses; i++) {
+		cout << *course[i] << endl;	
+	}
+}
+
+/*********************************************
+**			 PERFORMANCE MEASURE
+**
+**********************************************/
+bool Problem::isSolved() {
+	int randomlyIsSolved = rnd.nextInt(1, 100);
+	if(randomlyIsSolved < 3) return 1; // 2% Solved , geblek bangettt
+	else return 0;
 }
 
 #endif

@@ -4,6 +4,7 @@ using namespace std;
 
 int main() {
 	Problem n;
+	n.solveUsingKocokan(1000);
 	return 0;
 }
 

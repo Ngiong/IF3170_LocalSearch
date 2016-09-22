@@ -106,8 +106,9 @@ Problem& Problem::operator= (const Problem &P) {
 **********************************************/
 void Problem::initByRandom() {
 	for(int i=0; i<nCourses; i++) {
-		cout << "rnd di initrandom " << rnd.nextInt(10) << endl;
+		// Set Waktu
 		int randomlyChosenRoomIdx;
+		int randomlyChosenDay, randomlyChosenStartTime;
 		do {
 			// Set Ruangan
 			if(course[i]->isButuhRuang()) {
@@ -119,7 +120,7 @@ void Problem::initByRandom() {
 						k++;
 					}
 				}
-				randomlyChosenRoomIdx = rnd.nextInt(k);
+				randomlyChosenRoomIdx = calonRuangId[rnd.nextInt(k+1)];
 			}
 			else {
 				randomlyChosenRoomIdx = rnd.nextInt(nRooms);	
@@ -127,8 +128,7 @@ void Problem::initByRandom() {
 			course[i]->currentRuangIdx = randomlyChosenRoomIdx;
 			course[i]->currentRuang = room[randomlyChosenRoomIdx]->ruangName;
 		
-			// Set Waktu
-			int randomlyChosenDay, randomlyChosenStartTime;
+
 			// * Set hari dulu
 			do {
 				randomlyChosenDay = rnd.nextInt(1, 5);	
@@ -144,7 +144,8 @@ void Problem::initByRandom() {
 			randomlyChosenStartTime = rnd.nextInt(courseBegin, courseEnd-courseDuration);
 			course[i]->currentStartTime = randomlyChosenStartTime;
 			// Tidak perlu di do..while karena random nya PASTI masuk di range courseBegin dan courseEnd
-		} while (!room[randomlyChosenRoomIdx]->isTimeAvail(course[i]->currentStartTime, course[i]->currentStartTime + course[i]->duration));
+		} while (!room[randomlyChosenRoomIdx]->isTimeAvail(course[i]->currentStartTime, course[i]->currentStartTime + course[i]->duration)
+				|| !room[randomlyChosenRoomIdx]->isDayAvail(randomlyChosenDay));
 		// do while sampe dapet Ruang yang available;
 		
 		
@@ -194,18 +195,9 @@ void Problem::solveUsingSA(double temperature, double descentRate, int n, int ma
 	int stepCounter = 0;
 	Problem tempSolution = *this;
 	int tempEvalValue = countConflictCourses();
-	for(int i = 0; i < 10; i++)
-		cout << "rnd di solveSA " << rnd.nextInt(10) << endl;
-	// random yang ini jalan
 	while(tempEvalValue > 0 && stepCounter++ < maxSteps) {
-		srand (time(NULL));
-		cout << "rnd di solveSA " << rnd.nextInt(10) << endl;
-		// random yang ini ga jalan	
-		
-	//	cout << tempEvalValue << " " << stepCounter << endl;
-		
-		tempSolution = modifySolution(*this);
 		for(int i = 0; i < n; i++) {
+			tempSolution = modifySolution(*this);
 			int newEvalValue = tempSolution.countConflictCourses();
 			int deltaEval = newEvalValue - tempEvalValue;
 			if(deltaEval > 0) {
@@ -215,18 +207,22 @@ void Problem::solveUsingSA(double temperature, double descentRate, int n, int ma
 				*this = tempSolution;
 				tempEvalValue = countConflictCourses();
 			}
-			cout << "hehehe " << rnd.nextDouble() << endl;
+			cout << "step : " << (stepCounter-1)*10+i << " conflict : " << tempEvalValue << endl;
+			if(tempEvalValue == 0) break;
 		}
 		temperature -= descentRate;
+
+	}
+	for(int i=0; i<nCourses; i++) {
+		cout << *course[i] << endl;	
 	}
 }
 
 Problem Problem::modifySolution(Problem P) {
 	int randomlyChosenCourse = P.rnd.nextInt(nCourses);
-/*	for(int i = 0; i < 10; i++)
-		cout << "rnd di modify " << rnd.nextInt(10) << endl;
-	cout << "course diubah " << randomlyChosenCourse << endl;*/
 	int randomlyChosenRoomIdx;
+	int randomlyChosenDay, randomlyChosenStartTime;
+//	cout << "course diubah " << randomlyChosenCourse << endl;
 	do {
 		// Set Ruangan
 		if(P.course[randomlyChosenCourse]->isButuhRuang()) {
@@ -238,16 +234,14 @@ Problem Problem::modifySolution(Problem P) {
 					k++;
 				}
 			}
-			randomlyChosenRoomIdx = rnd.nextInt(k);
+			randomlyChosenRoomIdx = calonRuangId[rnd.nextInt(k+1)];
 		}
 		else {
-			randomlyChosenRoomIdx = rnd.nextInt(nRooms);	
+			randomlyChosenRoomIdx = rnd.nextInt(nRooms);
 		}
 		P.course[randomlyChosenCourse]->currentRuangIdx = randomlyChosenRoomIdx;
 		P.course[randomlyChosenCourse]->currentRuang = room[randomlyChosenRoomIdx]->ruangName;
 	
-		// Set Waktu
-		int randomlyChosenDay, randomlyChosenStartTime;
 		// * Set hari dulu
 		do {
 			randomlyChosenDay = P.rnd.nextInt(1, 5);	
@@ -264,10 +258,10 @@ Problem Problem::modifySolution(Problem P) {
 		P.course[randomlyChosenCourse]->currentStartTime = randomlyChosenStartTime;
 		// Tidak perlu di do..while karena random nya PASTI masuk di range courseBegin dan courseEnd
 	} while (!P.room[randomlyChosenRoomIdx]->isTimeAvail(P.course[randomlyChosenCourse]->currentStartTime,
-			P.course[randomlyChosenCourse]->currentStartTime + P.course[randomlyChosenCourse]->duration));
+			P.course[randomlyChosenCourse]->currentStartTime + P.course[randomlyChosenCourse]->duration)
+			|| !room[randomlyChosenRoomIdx]->isDayAvail(randomlyChosenDay));
 	return P;
 }
-
 
 /*********************************************
 **			 PERFORMANCE MEASURE

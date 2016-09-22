@@ -4,7 +4,8 @@ using namespace std;
 
 int main() {
 	Problem n;
-	n.solveUsingKocokan(1000);
+	int count = n.countConflictCourses();
+	cout << count << endl;
 	return 0;
 }
 

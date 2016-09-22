@@ -41,6 +41,7 @@ class Kuliah {
 		bool days[8];
 			
 		string currentRuang;
+		int currentRuangIdx;
 		int currentStartTime, currentDay;
 };
 
@@ -50,6 +51,7 @@ ostream& operator<< (ostream& out, Kuliah& K) {
 	out << K.getKode() << " : " << K.getCurrentRuang() << endl;
 	out << "** Hari  : " << K.getCurrentDay() << endl;
 	out << "** Pukul : " << K.getCurrentStartTime() << " hingga " << K.getCurrentStartTime() + K.getDuration();
+	return out;
 }
 
 Kuliah::Kuliah() {

@@ -11,13 +11,16 @@ class Problem {
 	public :
 		Problem();
 		Problem(int, int);
+		Problem(const Problem &P);
 		~Problem();
+		Problem& operator= (const Problem &P);
 		
 		// Solver
 		void solveUsingHCA();
-		void solveUsingSA();
+		void solveUsingSA(double, double, int, int);
 		void solveUsingGA();
 		void solveUsingKocokan(int); // maxSteps
+		Problem modifySolution(Problem P);
 		
 		// Init
 		void initByRandom();
@@ -27,6 +30,7 @@ class Problem {
 		
 		// Performance Measure
 		bool isSolved();
+		int countConflictCourses();
 		
 	private :
 		int nRooms, nCourses;
@@ -64,9 +68,36 @@ Problem::Problem(int nRuang, int nKuliah) {
 	// cout << rooms[1].ruangName << endl; // Bisa karena sudah di FRIEND kan biar gampang gitchuuu :v
 }
 
+Problem::Problem(const Problem &P) {
+	nRooms = P.nRooms; nCourses = P.nCourses;
+	room = new Ruang * [nRooms];
+	course = new Kuliah * [nCourses];
+	
+	for(int i = 0; i < nRooms; i++) {
+		room[i] = P.room[i];
+	}
+	for(int i = 0; i < nCourses; i++) {
+		course[i] = P.course[i];
+	}
+}
+
 Problem::~Problem() {
 	delete [] room;
 	delete [] course;	
+}
+
+Problem& Problem::operator= (const Problem &P) {
+	nRooms = P.nRooms; nCourses = P.nCourses;
+	room = new Ruang * [nRooms];
+	course = new Kuliah * [nCourses];
+	
+	for(int i = 0; i < nRooms; i++) {
+		room[i] = P.room[i];
+	}
+	for(int i = 0; i < nCourses; i++) {
+		course[i] = P.course[i];
+	}	
+	return *this;
 }
 
 /*********************************************
@@ -75,30 +106,47 @@ Problem::~Problem() {
 **********************************************/
 void Problem::initByRandom() {
 	for(int i=0; i<nCourses; i++) {
-		// Set Ruangan
-		if(course[i]->isButuhRuang()) course[i]->currentRuang = course[i]->butuhRuang;	
-		else {
-			int randomlyPickedRoomIdx = rnd.nextInt(nRooms);
-			course[i]->currentRuang = room[randomlyPickedRoomIdx]->getName();	
-		}
-		
-		// Set Waktu
-		int randomlyChosenDay, randomlyChosenStartTime;
-		// * Set hari dulu
+		cout << "rnd di initrandom " << rnd.nextInt(10) << endl;
+		int randomlyChosenRoomIdx;
 		do {
-			randomlyChosenDay = rnd.nextInt(1, 5);	
-		} while(!course[i]->isDayAvail(randomlyChosenDay));
-		course[i]->currentDay = randomlyChosenDay; 
-		// Sayangnya : ini bisa kebobol kalo Ruangannya ga available
-		// Tapi itulah LOCAL SEARCH, sering dibiarin aja salah duluan, ntar akhir2nya jadi bener...
+			// Set Ruangan
+			if(course[i]->isButuhRuang()) {
+				int calonRuangId[200];
+				int k = 0;
+				for(int j=0; j<nRooms; j++) {
+					if(course[i]->butuhRuang == room[j]->ruangName) {
+						calonRuangId[k] = room[j]->ruangId;
+						k++;
+					}
+				}
+				randomlyChosenRoomIdx = rnd.nextInt(k);
+			}
+			else {
+				randomlyChosenRoomIdx = rnd.nextInt(nRooms);	
+			}
+			course[i]->currentRuangIdx = randomlyChosenRoomIdx;
+			course[i]->currentRuang = room[randomlyChosenRoomIdx]->ruangName;
 		
-		// * Set waktu
-		int courseBegin = course[i]->getStartTime(), 
-			courseEnd = course[i]->getEndTime(), 
-			courseDuration = course[i]->getDuration();
-		randomlyChosenStartTime = rnd.nextInt(courseBegin, courseEnd-courseDuration);
-		course[i]->currentStartTime = randomlyChosenStartTime;
-		// Tidak perlu di do..while karena random nya PASTI masuk di range courseBegin dan courseEnd
+			// Set Waktu
+			int randomlyChosenDay, randomlyChosenStartTime;
+			// * Set hari dulu
+			do {
+				randomlyChosenDay = rnd.nextInt(1, 5);	
+			} while(!course[i]->isDayAvail(randomlyChosenDay));
+			course[i]->currentDay = randomlyChosenDay; 
+			// Sayangnya : ini bisa kebobol kalo Ruangannya ga available
+			// Tapi itulah LOCAL SEARCH, sering dibiarin aja salah duluan, ntar akhir2nya jadi bener...
+			
+			// * Set waktu
+			int courseBegin = course[i]->getStartTime(), 
+				courseEnd = course[i]->getEndTime(), 
+				courseDuration = course[i]->getDuration();
+			randomlyChosenStartTime = rnd.nextInt(courseBegin, courseEnd-courseDuration);
+			course[i]->currentStartTime = randomlyChosenStartTime;
+			// Tidak perlu di do..while karena random nya PASTI masuk di range courseBegin dan courseEnd
+		} while (!room[randomlyChosenRoomIdx]->isTimeAvail(course[i]->currentStartTime, course[i]->currentStartTime + course[i]->duration));
+		// do while sampe dapet Ruang yang available;
+		
 		
 		// ** Bisa juga alternatifnya, set hari dan waktu bersamaan
 	}
@@ -140,6 +188,87 @@ void Problem::solveUsingKocokan(int maxSteps) {
 	}
 }
 
+void Problem::solveUsingSA(double temperature, double descentRate, int n, int maxSteps) {	
+	initByRandom();
+	
+	int stepCounter = 0;
+	Problem tempSolution = *this;
+	int tempEvalValue = countConflictCourses();
+	for(int i = 0; i < 10; i++)
+		cout << "rnd di solveSA " << rnd.nextInt(10) << endl;
+	// random yang ini jalan
+	while(tempEvalValue > 0 && stepCounter++ < maxSteps) {
+		srand (time(NULL));
+		cout << "rnd di solveSA " << rnd.nextInt(10) << endl;
+		// random yang ini ga jalan	
+		
+	//	cout << tempEvalValue << " " << stepCounter << endl;
+		
+		tempSolution = modifySolution(*this);
+		for(int i = 0; i < n; i++) {
+			int newEvalValue = tempSolution.countConflictCourses();
+			int deltaEval = newEvalValue - tempEvalValue;
+			if(deltaEval > 0) {
+				*this = tempSolution;
+				tempEvalValue = countConflictCourses();
+			} else if (exp(-deltaEval/temperature) > rnd.nextDouble()) {
+				*this = tempSolution;
+				tempEvalValue = countConflictCourses();
+			}
+			cout << "hehehe " << rnd.nextDouble() << endl;
+		}
+		temperature -= descentRate;
+	}
+}
+
+Problem Problem::modifySolution(Problem P) {
+	int randomlyChosenCourse = P.rnd.nextInt(nCourses);
+/*	for(int i = 0; i < 10; i++)
+		cout << "rnd di modify " << rnd.nextInt(10) << endl;
+	cout << "course diubah " << randomlyChosenCourse << endl;*/
+	int randomlyChosenRoomIdx;
+	do {
+		// Set Ruangan
+		if(P.course[randomlyChosenCourse]->isButuhRuang()) {
+			int calonRuangId[200];
+			int k = 0;
+			for(int j=0; j<nRooms; j++) {
+				if(P.course[randomlyChosenCourse]->butuhRuang == P.room[j]->ruangName) {
+					calonRuangId[k] = P.room[j]->ruangId;
+					k++;
+				}
+			}
+			randomlyChosenRoomIdx = rnd.nextInt(k);
+		}
+		else {
+			randomlyChosenRoomIdx = rnd.nextInt(nRooms);	
+		}
+		P.course[randomlyChosenCourse]->currentRuangIdx = randomlyChosenRoomIdx;
+		P.course[randomlyChosenCourse]->currentRuang = room[randomlyChosenRoomIdx]->ruangName;
+	
+		// Set Waktu
+		int randomlyChosenDay, randomlyChosenStartTime;
+		// * Set hari dulu
+		do {
+			randomlyChosenDay = P.rnd.nextInt(1, 5);	
+		} while(!P.course[randomlyChosenCourse]->isDayAvail(randomlyChosenDay));
+		P.course[randomlyChosenCourse]->currentDay = randomlyChosenDay; 
+		// Sayangnya : ini bisa kebobol kalo Ruangannya ga available
+		// Tapi itulah LOCAL SEARCH, sering dibiarin aja salah duluan, ntar akhir2nya jadi bener...
+		
+		// * Set waktu
+		int courseBegin = P.course[randomlyChosenCourse]->getStartTime(), 
+			courseEnd = P.course[randomlyChosenCourse]->getEndTime(), 
+			courseDuration = P.course[randomlyChosenCourse]->getDuration();
+		randomlyChosenStartTime = P.rnd.nextInt(courseBegin, courseEnd-courseDuration);
+		P.course[randomlyChosenCourse]->currentStartTime = randomlyChosenStartTime;
+		// Tidak perlu di do..while karena random nya PASTI masuk di range courseBegin dan courseEnd
+	} while (!P.room[randomlyChosenRoomIdx]->isTimeAvail(P.course[randomlyChosenCourse]->currentStartTime,
+			P.course[randomlyChosenCourse]->currentStartTime + P.course[randomlyChosenCourse]->duration));
+	return P;
+}
+
+
 /*********************************************
 **			 PERFORMANCE MEASURE
 **
@@ -150,4 +279,25 @@ bool Problem::isSolved() {
 	else return 0;
 }
 
+int Problem::countConflictCourses() {
+	int count = 0;
+	
+	for(int i=0; i<nCourses-1; i++) {
+		for(int j=i+1; j<nCourses; j++) {
+			if(course[i]->currentRuang == course[j]->currentRuang) {
+				if(course[i]->currentDay == course[j]->currentDay) {
+					int maks, minim;
+					maks = max(course[i]->currentStartTime, course[j]->currentStartTime);
+					minim = min(course[i]->currentStartTime + course[i]->getDuration(),
+								course[j]->currentStartTime + course[j]->getDuration());
+					// tambah sesuai banyaknya jam yang bentrok
+					if(maks <= minim) {
+						count += minim - maks;
+					}
+				}
+			}
+		}
+	}
+	return count;
+}
 #endif

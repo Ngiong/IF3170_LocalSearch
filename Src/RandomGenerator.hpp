@@ -16,6 +16,9 @@ class RandomGenerator {
 		int nextInt(int lo, int hi) {
 			return ((rand() % (hi-lo+1))+lo);	
 		}
+		double nextDouble() {
+			return ( rand() / (double)RAND_MAX);
+		}
 		
 };
 

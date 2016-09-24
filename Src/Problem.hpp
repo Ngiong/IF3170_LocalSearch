@@ -117,11 +117,11 @@ void Problem::initByRandom() {
 				int k = 0;
 				for(int j=0; j<nRooms; j++) {
 					if(course[i]->butuhRuang == room[j]->ruangName) {
-						calonRuangId[k] = room[j]->ruangId;
+						calonRuangId[k] = j;
 						k++;
 					}
 				}
-				randomlyChosenRoomIdx = calonRuangId[rnd.nextInt(k+1)];
+				randomlyChosenRoomIdx = calonRuangId[rnd.nextInt(k)];
 			}
 			else {
 				randomlyChosenRoomIdx = rnd.nextInt(nRooms);	
@@ -272,11 +272,11 @@ Problem Problem::modifySolution(Problem P) {
 			int k = 0;
 			for(int j=0; j<nRooms; j++) {
 				if(P.course[randomlyChosenCourse]->butuhRuang == P.room[j]->ruangName) {
-					calonRuangId[k] = P.room[j]->ruangId;
+					calonRuangId[k] = j;
 					k++;
 				}
 			}
-			randomlyChosenRoomIdx = calonRuangId[rnd.nextInt(k+1)];
+			randomlyChosenRoomIdx = calonRuangId[rnd.nextInt(k)];
 		}
 		else {
 			randomlyChosenRoomIdx = rnd.nextInt(nRooms);

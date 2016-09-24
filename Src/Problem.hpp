@@ -16,11 +16,12 @@ class Problem {
 		Problem& operator= (const Problem &P);
 		
 		// Solver
-		void solveUsingHCA();
+		void solveUsingHill();
 		void solveUsingSA(double, double, int, int);
 		void solveUsingGA();
 		void solveUsingKocokan(int); // maxSteps
 		Problem modifySolution(Problem P);
+		Problem modifySolutionHill(Problem P);
 		
 		// Init
 		void initByRandom();
@@ -189,18 +190,22 @@ void Problem::solveUsingKocokan(int maxSteps) {
 	}
 }
 
-void Problem::solveUsingSA(double temperature, double descentRate, int n, int maxSteps) {	
+void Problem::solveUsingSA(double temperature, double descentRate, int n, int maxSteps) {
 	initByRandom();
-	
+	for(int i=0; i<nCourses; i++) {
+			cout << *course[i] << endl;	
+		}
+
 	int stepCounter = 0;
 	Problem tempSolution = *this;
 	int tempEvalValue = countConflictCourses();
+
 	while(tempEvalValue > 0 && stepCounter++ < maxSteps) {
 		for(int i = 0; i < n; i++) {
 			tempSolution = modifySolution(*this);
 			int newEvalValue = tempSolution.countConflictCourses();
 			int deltaEval = newEvalValue - tempEvalValue;
-			if(deltaEval > 0) {
+			if(deltaEval < 0) {
 				*this = tempSolution;
 				tempEvalValue = countConflictCourses();
 			} else if (exp(-deltaEval/temperature) > rnd.nextDouble()) {
@@ -213,6 +218,43 @@ void Problem::solveUsingSA(double temperature, double descentRate, int n, int ma
 		temperature -= descentRate;
 
 	}
+	for(int i=0; i<nCourses; i++) {
+		cout << *course[i] << endl;	
+	}
+}
+
+void Problem::solveUsingHill() {
+	int stepCounter;
+	Problem tempSolution = *this;
+	int tempEvalValue;
+	int newEvalValue;
+	bool isLocalMaxima;
+
+	do {
+		cout << "Restart" << endl;
+		initByRandom();
+		for(int i=0; i<nCourses; i++) {
+			cout << *course[i] << endl;	
+		}
+		stepCounter = 0;
+		tempEvalValue = countConflictCourses();
+		cout << "step : 0 conflict : " << tempEvalValue << endl;
+		isLocalMaxima = false;
+		while(isLocalMaxima == false && tempEvalValue>0) {
+			tempSolution = modifySolution(*this);
+			newEvalValue = tempSolution.countConflictCourses();
+			if (newEvalValue <= tempEvalValue) {
+				*this = tempSolution;
+				tempEvalValue = countConflictCourses();
+				stepCounter++;
+				cout << "step : " << stepCounter << " conflict : " << tempEvalValue << endl;
+			}
+			else {
+				isLocalMaxima = true;
+				cout << "conflict terpilih: " << newEvalValue << ", tidak diterima" << endl; 
+			}
+		}
+	} while (tempEvalValue>0);
 	for(int i=0; i<nCourses; i++) {
 		cout << *course[i] << endl;	
 	}

@@ -24,6 +24,7 @@ class Problem {
 		Problem modifySolutionHill(Problem P);
 		
 		// Init
+		void fileToVar(string file);
 		void initByRandom();
 		void initByMikir(); /* ================== BERHARAP BANYAK DENGAN METHOD INI ==========================*/
 		// Salah satu yg bisa dipertimbangkan untuk initByMikir adalah menjadikan sebuah matrix terlebih dahulu, 
@@ -105,6 +106,88 @@ Problem& Problem::operator= (const Problem &P) {
 **				VARIABLE INITIATOR
 **
 **********************************************/
+void Problem::fileToVar(string file) {
+	string line;
+	nRooms = nCourses = 0;
+
+	ifstream myfile(file);
+	// identify jumlah ruang dan jadwal
+	if (myfile.is_open()) {
+		getline(myfile, line);
+		while (line != "Jadwal") {
+			nRooms++;
+			getline(myfile, line);	
+		}
+		nRooms -= 2;
+		while (getline(myfile, line)) {
+			nCourses++;
+		}
+		myfile.close();
+
+		// create
+		room = new Ruang * [nRooms];
+		course = new Kuliah * [nCourses];
+	}
+	else {
+		cout << "Unable to open file." << endl;
+	}
+
+	// masukkan info file ke var
+	myfile.open(file);
+	if (myfile.is_open()) {
+		getline(myfile, line);
+		string ruangan;
+		int startTime, finishTime;
+		bool isSenin, isSelasa, isRabu, isKamis, isJumat;
+ 		// masukin info ruangan
+		int j;
+		for (int i=0; i<nRooms; i++) {
+			ruangan = "";
+			startTime = finishTime = 0;
+			isSenin, isSelasa, isRabu, isKamis, isJumat = false;
+			getline(myfile, line);
+			j = 0;
+			while (line[j] != ';') {
+				ruangan = ruangan + line[j];
+				j++;
+			}
+			j++;
+			while (line[j] != '.') {
+				startTime = startTime*10 + (line[j]-48);
+				j++;
+			}
+			j+=4;
+			while (line[j] != '.') {
+				finishTime = finishTime*10 + (line[j]-48);
+				j++;
+			}
+			j+=4;
+			while (j<line.length()) {
+				if (line[j] == '1') {
+					isSenin = true;
+				}
+				else if (line[j] == '2') {
+					isSelasa = true;
+				}
+				else if (line[j] == '3') {
+					isRabu = true;
+				}
+				else if (line[j] == '4') {
+					isKamis = true;
+				}
+				else if (line[j] == '5') {
+					isJumat = true;
+				}
+ 				j++;
+			}
+			room[i] = new Ruang(ruangan, startTime, finishTime, isSenin, isSelasa, isRabu, isKamis, isJumat);
+		}
+	}
+	else {
+		cout << "Unable to open file." << endl;
+	}
+}
+
 void Problem::initByRandom() {
 	for(int i=0; i<nCourses; i++) {
 		// Set Waktu

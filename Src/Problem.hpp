@@ -193,8 +193,8 @@ void Problem::solveUsingKocokan(int maxSteps) {
 void Problem::solveUsingSA(double temperature, double descentRate, int n, int maxSteps) {
 	initByRandom();
 	for(int i=0; i<nCourses; i++) {
-			cout << *course[i] << endl;	
-		}
+		cout << *course[i] << endl;	
+	}
 
 	int stepCounter = 0;
 	Problem tempSolution = *this;
@@ -226,9 +226,9 @@ void Problem::solveUsingSA(double temperature, double descentRate, int n, int ma
 void Problem::solveUsingHill() {
 	int stepCounter;
 	Problem tempSolution = *this;
-	int tempEvalValue;
-	int newEvalValue;
-	bool isLocalMaxima;
+	int tempEvalValue, newEvalValue;
+	bool isLocalMinimum;
+	int boundLocal;
 
 	do {
 		cout << "Restart" << endl;
@@ -237,21 +237,27 @@ void Problem::solveUsingHill() {
 			cout << *course[i] << endl;	
 		}
 		stepCounter = 0;
+		boundLocal = 0;
 		tempEvalValue = countConflictCourses();
 		cout << "step : 0 conflict : " << tempEvalValue << endl;
-		isLocalMaxima = false;
-		while(isLocalMaxima == false && tempEvalValue>0) {
+		isLocalMinimum = false;
+		while(isLocalMinimum == false && tempEvalValue>0) {
 			tempSolution = modifySolution(*this);
 			newEvalValue = tempSolution.countConflictCourses();
-			if (newEvalValue <= tempEvalValue) {
+			if (newEvalValue < tempEvalValue) {
 				*this = tempSolution;
 				tempEvalValue = countConflictCourses();
 				stepCounter++;
 				cout << "step : " << stepCounter << " conflict : " << tempEvalValue << endl;
 			}
 			else {
-				isLocalMaxima = true;
-				cout << "conflict terpilih: " << newEvalValue << ", tidak diterima" << endl; 
+				if (boundLocal <= 10) {
+					boundLocal++;
+				}
+				else {
+					isLocalMinimum = true;
+					cout << "conflict terpilih: " << newEvalValue << ", tidak diterima" << endl; 
+				}
 			}
 		}
 	} while (tempEvalValue>0);

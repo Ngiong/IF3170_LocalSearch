@@ -1,0 +1,7 @@
+tc 1 : dari soal yang diberikan
+tc 2 : Misalkan hanya 2 hari (Senin, Selasa), ada 6 kuliah : masing2 2 jam... Kalau ditambah 1 SKS, harusnya juga bisa
+tc 3 : @inherit(tc2), tapi ada 2x Kuliah1SKS.. Harusnya 22nya masuk
+tc 4 : @inherit(tc3), tapi ada tambahan 1 Kuliah1SKS, harusnya ga masuk...
+tc 5 : @inherit(tc4), tapi tambahan 1 ruangan buat nampung 1 sks itu
+tc 6 : @inherit(tc5), tapi kalau RuanganPenyelamat nya jadi 2 jam // tidak merubah solusi
+tc 7 : @inherit(tc6), tapi kalau yg tadinya kan RuangPenyelamatnya jadi 2 jam, berarti ada 1 kuliah 2 SKS yang harusnya bisa ditaruh di sana... 2 buah kuliah 1SKS akan diubah jadi 1 kuliah 3SKS

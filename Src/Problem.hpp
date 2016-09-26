@@ -136,15 +136,15 @@ void Problem::fileToVar(string file) {
 	myfile.open(file);
 	if (myfile.is_open()) {
 		getline(myfile, line);
-		string ruangan;
-		int startTime, finishTime;
+		string ruangan, jadwal;
+		int startTime, finishTime, durasi;
 		bool isSenin, isSelasa, isRabu, isKamis, isJumat;
  		// masukin info ruangan
 		int j;
 		for (int i=0; i<nRooms; i++) {
 			ruangan = "";
 			startTime = finishTime = 0;
-			isSenin, isSelasa, isRabu, isKamis, isJumat = false;
+			isSenin = isSelasa = isRabu = isKamis = isJumat = false;
 			getline(myfile, line);
 			j = 0;
 			while (line[j] != ';') {
@@ -180,8 +180,67 @@ void Problem::fileToVar(string file) {
 				}
  				j++;
 			}
+			cout << ruangan << " " << startTime << " " << finishTime << " " << isSenin << " " << isSelasa << " " << isRabu << " " << isKamis << " " << isJumat << endl;
 			room[i] = new Ruang(ruangan, startTime, finishTime, isSenin, isSelasa, isRabu, isKamis, isJumat);
 		}
+
+		// masukin info jadwal
+		getline(myfile, line);
+		getline(myfile, line);
+		for (int i=0; i<nCourses; i++) {
+			ruangan = jadwal = "";
+			startTime = finishTime = durasi = 0;
+			isSenin = isSelasa = isRabu = isKamis = isJumat = false;
+			getline(myfile, line);
+			j = 0;
+			while (line[j] != ';') {
+				jadwal = jadwal + line[j];
+				j++;
+			}
+			j++;
+			while (line[j] != ';') {
+				ruangan = ruangan + line[j];
+				j++;
+			}
+			j++;
+			while (line[j] != '.') {
+				startTime = startTime*10 + (line[j]-48);
+				j++;
+			}
+			j+=4;
+			while (line[j] != '.') {
+				finishTime = finishTime*10 + (line[j]-48);
+				j++;
+			}
+			j+=4;
+			while (line[j] != ';') {
+				durasi = durasi*10 + (line[j]-48);
+				j++;
+			}
+			j++;
+			while (j<line.length()) {
+				if (line[j] == '1') {
+					isSenin = true;
+				}
+				else if (line[j] == '2') {
+					isSelasa = true;
+				}
+				else if (line[j] == '3') {
+					isRabu = true;
+				}
+				else if (line[j] == '4') {
+					isKamis = true;
+				}
+				else if (line[j] == '5') {
+					isJumat = true;
+				}
+ 				j++;
+			}
+
+			cout << jadwal << " " << ruangan << " " << startTime << " " << finishTime << " " << durasi << " " << isSenin << " " << isSelasa << " " << isRabu << " " << isKamis << " " << isJumat << endl;
+			course[i] = new Kuliah(jadwal, ruangan, startTime, finishTime, durasi, isSenin, isSelasa, isRabu, isKamis, isJumat);
+		}
+		myfile.close();
 	}
 	else {
 		cout << "Unable to open file." << endl;

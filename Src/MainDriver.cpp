@@ -9,20 +9,21 @@ int main() {
 	cout << "********************" << endl;
 	cout << "*** LOCAL SEARCH ***" << endl;
 	cout << "********************" << endl << endl;
-	//cout << "Masukkan testcase: "; cin >> file;
-	//n.fileToVar(file);
+	cout << "Masukkan testcase: "; cin >> file;
+	n.fileToVar(file);
 
 	//cout << "yolo" << endl;
-	n.solveUsingSA(1, 0.01, 10, 100);
+	//n.solveUsingSA(1, 0.01, 10, 100);
 	//n.solveUsingHill();
-	int count = n.countConflictCourses();
-	cout << "CONFLICT : " << count << endl;
+	//int count = n.countConflictCourses();
+	//cout << "CONFLICT : " << count << endl;
 	
 	////////////////////////////////////////////////////
 	//////////// Bagian GUI ////////////////////////////
 	////////////////////////////////////////////////////
 	//* kalo mw ngetes, pindahin semua filenya ke xampp/htdocs terus compile : g++ MainDriver.cpp -o MainDriver.cgi -std=c++11
 	//* ati2 kalo cout di terminal, kode dibawah ini di comment dulu jng lupa wkwk
+	/*
 	cout<<"Content-type: text/html"<<endl<<endl;
 	cout <<"<html>"<<endl;
 	cout << "<head>" << endl;
@@ -103,6 +104,7 @@ int main() {
 	cout << "<script src=\"drag.js\" type=\"text/javascript\"></script>" << endl;
 	cout << "</body>" << endl;
 	cout << "</html>" << endl;
+	*/
 	
 	return 0;
 }

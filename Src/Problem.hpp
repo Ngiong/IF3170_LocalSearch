@@ -10,18 +10,17 @@ using namespace std;
 class Problem {
 	public :
 		Problem();
-		Problem(int, int);
+		Problem(string file);
 		Problem(const Problem &P);
 		~Problem();
 		Problem& operator= (const Problem &P);
 		
 		// Solver
-		void solveUsingHill();
+		void solveUsingHill(int maxRestart);
 		void solveUsingSA(double, double, int, int);
 		void solveUsingGA();
 		void solveUsingKocokan(int); // maxSteps
 		Problem modifySolution(Problem P);
-		Problem modifySolutionHill(Problem P);
 		
 		// Init
 		void fileToVar(string file);
@@ -42,7 +41,7 @@ class Problem {
 };
 
 Problem::Problem() {
-	nRooms = 4; nCourses = 8;
+/*	nRooms = 4; nCourses = 8;
 	room = new Ruang * [4];
 	room[0] = new Ruang("7602", 7, 14, 1,1,1,1,1); // perhatikan kalau kita maunya 1-based index u/ array
 	room[1] = new Ruang("7603", 7, 14, 1,0,1,0,1);
@@ -56,57 +55,11 @@ Problem::Problem() {
 	course[4] = new Kuliah("IF3110", "7602", 7,  9, 2, 1,1,1,1,1);
 	course[5] = new Kuliah("IF3130", "-",    7, 12, 2, 0,0,1,1,1);
 	course[6] = new Kuliah("IF3170", "7602", 7,  9, 2, 1,1,1,1,1);
-	course[7] = new Kuliah("IF3111", "-",    7, 12, 2, 1,1,1,1,1);
+	course[7] = new Kuliah("IF3111", "-",    7, 12, 2, 1,1,1,1,1);*/
 }
 
 // Ntar dikasih fitur untuk nge-parse juga dari file
-Problem::Problem(int nRuang, int nKuliah) {
-	nRooms = nRuang; nCourses = nKuliah;
-	room = new Ruang * [nRuang];
-	course = new Kuliah * [nKuliah];
-	/******************************************
-	*    Edit2 Spek Ruang dan Kuliah di sini
-	*******************************************/
-	// cout << rooms[1].ruangName << endl; // Bisa karena sudah di FRIEND kan biar gampang gitchuuu :v
-}
-
-Problem::Problem(const Problem &P) {
-	nRooms = P.nRooms; nCourses = P.nCourses;
-	room = new Ruang * [nRooms];
-	course = new Kuliah * [nCourses];
-	
-	for(int i = 0; i < nRooms; i++) {
-		room[i] = P.room[i];
-	}
-	for(int i = 0; i < nCourses; i++) {
-		course[i] = P.course[i];
-	}
-}
-
-Problem::~Problem() {
-	delete [] room;
-	delete [] course;	
-}
-
-Problem& Problem::operator= (const Problem &P) {
-	nRooms = P.nRooms; nCourses = P.nCourses;
-	room = new Ruang * [nRooms];
-	course = new Kuliah * [nCourses];
-	
-	for(int i = 0; i < nRooms; i++) {
-		room[i] = P.room[i];
-	}
-	for(int i = 0; i < nCourses; i++) {
-		course[i] = P.course[i];
-	}	
-	return *this;
-}
-
-/*********************************************
-**				VARIABLE INITIATOR
-**
-**********************************************/
-void Problem::fileToVar(string file) {
+Problem::Problem(string file) {
 	string line;
 	nRooms = nCourses = 0;
 
@@ -245,8 +198,48 @@ void Problem::fileToVar(string file) {
 	else {
 		cout << "Unable to open file." << endl;
 	}
+	/******************************************
+	*    Edit2 Spek Ruang dan Kuliah di sini
+	*******************************************/
+	// cout << rooms[1].ruangName << endl; // Bisa karena sudah di FRIEND kan biar gampang gitchuuu :v
 }
 
+Problem::Problem(const Problem &P) {
+	nRooms = P.nRooms; nCourses = P.nCourses;
+	room = new Ruang * [nRooms];
+	course = new Kuliah * [nCourses];
+	
+	for(int i = 0; i < nRooms; i++) {
+		room[i] = P.room[i];
+	}
+	for(int i = 0; i < nCourses; i++) {
+		course[i] = P.course[i];
+	}
+}
+
+Problem::~Problem() {
+	delete [] room;
+	delete [] course;	
+}
+
+Problem& Problem::operator= (const Problem &P) {
+	nRooms = P.nRooms; nCourses = P.nCourses;
+	room = new Ruang * [nRooms];
+	course = new Kuliah * [nCourses];
+	
+	for(int i = 0; i < nRooms; i++) {
+		room[i] = P.room[i];
+	}
+	for(int i = 0; i < nCourses; i++) {
+		course[i] = P.course[i];
+	}	
+	return *this;
+}
+
+/*********************************************
+**				VARIABLE INITIATOR
+**
+**********************************************/
 void Problem::initByRandom() {
 	for(int i=0; i<nCourses; i++) {
 		// Set Waktu
@@ -358,51 +351,69 @@ void Problem::solveUsingSA(double temperature, double descentRate, int n, int ma
 			if(tempEvalValue == 0) break;
 		}
 		temperature -= descentRate;
-
+		cout << "conflict dalam while " << countConflictCourses() << endl;
 	}
+	cout << "conflict atas for " << countConflictCourses() << endl;
 	for(int i=0; i<nCourses; i++) {
 		cout << *course[i] << endl;	
 	}
+	cout << "conflict " << tempEvalValue << endl;
 }
 
-void Problem::solveUsingHill() {
-	int stepCounter;
+void Problem::solveUsingHill(int maxRestart) {
+	int stepCounter, boundLocal, countRestart = 0, minConflict = 999;
 	Problem tempSolution = *this;
+	Problem minimum;
 	int tempEvalValue, newEvalValue;
 	bool isLocalMinimum;
-	int boundLocal;
+	Kuliah ** tempCourse = new Kuliah * [nCourses];
 
 	do {
-		cout << "Restart" << endl;
+		//cout << "Restart" << endl;
 		initByRandom();
-		for(int i=0; i<nCourses; i++) {
-			cout << *course[i] << endl;	
-		}
 		stepCounter = 0;
 		boundLocal = 0;
 		tempEvalValue = countConflictCourses();
-		cout << "step : 0 conflict : " << tempEvalValue << endl;
+		//cout << "step : 0 conflict : " << tempEvalValue << endl;
 		isLocalMinimum = false;
 		while(isLocalMinimum == false && tempEvalValue>0) {
+			cout << "sebelum " <<  countConflictCourses() << " " << tempSolution.countConflictCourses() << endl;
+
 			tempSolution = modifySolution(*this);
+			cout << "sesudah " <<  countConflictCourses() << " " << tempSolution.countConflictCourses() << endl;
 			newEvalValue = tempSolution.countConflictCourses();
 			if (newEvalValue < tempEvalValue) {
+
+				cout << this->countConflictCourses() << " alkdsjfalsdkjflskadjflasd;jfl;sd " << tempSolution.countConflictCourses() << " lalal " << tempEvalValue << " " << newEvalValue << endl;
 				*this = tempSolution;
 				tempEvalValue = countConflictCourses();
 				stepCounter++;
-				cout << "step : " << stepCounter << " conflict : " << tempEvalValue << endl;
+				//cout << "step : " << stepCounter << " conflict : " << tempEvalValue << endl;
 			}
 			else {
-				if (boundLocal <= 10) {
+				if (boundLocal <= 1000) {
 					boundLocal++;
 				}
 				else {
 					isLocalMinimum = true;
-					cout << "conflict terpilih: " << newEvalValue << ", tidak diterima" << endl; 
+					//cout << "conflict terpilih: " << newEvalValue << ", tidak diterima" << endl; 
 				}
 			}
 		}
-	} while (tempEvalValue>0);
+		countRestart++;
+		cout << countRestart << " " << countConflictCourses() << " " << minConflict << endl;
+		if (countConflictCourses() < minConflict) {
+			minConflict = countConflictCourses();
+					cout << countConflictCourses() << " zxczxc" << minimum.countConflictCourses() << endl;
+	
+			minimum = *this;
+
+		}
+		cout << countConflictCourses() << "asdasdas" << minimum.countConflictCourses() << endl;
+	} while (tempEvalValue>0 && countRestart<=maxRestart);
+	cout << countConflictCourses() << " " << minimum.countConflictCourses() << endl;
+	*this = minimum;
+	cout << countConflictCourses() << " " << minimum.countConflictCourses() << endl;
 	for(int i=0; i<nCourses; i++) {
 		cout << *course[i] << endl;	
 	}

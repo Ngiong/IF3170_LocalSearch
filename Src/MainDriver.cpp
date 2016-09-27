@@ -3,20 +3,22 @@
 using namespace std;
 
 int main() {
-	Problem n;
+	//Problem n;
 	string file;
 	
 	cout << "********************" << endl;
 	cout << "*** LOCAL SEARCH ***" << endl;
 	cout << "********************" << endl << endl;
 	cout << "Masukkan testcase: "; cin >> file;
-	n.fileToVar(file);
+	file = "../tc/" + file;
+	//n.fileToVar(file);
+	Problem n(file);
 
-	//cout << "yolo" << endl;
+	cout << "yolo"  << endl;
 	//n.solveUsingSA(1, 0.01, 10, 100);
-	//n.solveUsingHill();
-	//int count = n.countConflictCourses();
-	//cout << "CONFLICT : " << count << endl;
+	n.solveUsingHill(10);
+	int count = n.countConflictCourses();
+	cout << "CONFLICT : " << count << endl;
 	
 	////////////////////////////////////////////////////
 	//////////// Bagian GUI ////////////////////////////
@@ -105,7 +107,6 @@ int main() {
 	cout << "</body>" << endl;
 	cout << "</html>" << endl;
 	*/
-	
 	return 0;
 }
 

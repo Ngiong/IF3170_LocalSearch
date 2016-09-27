@@ -437,15 +437,12 @@ void Genetic :: eval() {
 
 void Genetic :: solveGA(int nCycle) {
     geneticInit();
-    geneticSelection();
     eval();
     for(int i = 0; i < nCycle && bestConflict != 0; i++) {
+        geneticSelection();
         geneticCrossover();
+        geneticMutation();
         eval();
-        if (bestConflict != 0) {
-            geneticMutation();
-        }
-
     }
 
     int best, bestIdx;

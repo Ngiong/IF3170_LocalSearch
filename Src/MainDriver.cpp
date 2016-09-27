@@ -15,8 +15,8 @@ int main() {
 	Problem n(file);
 
 	cout << "yolo"  << endl;
-	//n.solveUsingSA(1, 0.01, 10, 100);
-	n.solveUsingHill(10);
+	n.solveUsingSA(1, 0.01, 10, 120);
+//	n.solveUsingHill(10);
 	int count = n.countConflictCourses();
 	cout << "CONFLICT : " << count << endl;
 	

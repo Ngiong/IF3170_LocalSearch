@@ -41,7 +41,7 @@ class Problem {
 };
 
 Problem::Problem() {
-/*	nRooms = 4; nCourses = 8;
+	nRooms = 4; nCourses = 8;
 	room = new Ruang * [4];
 	room[0] = new Ruang("7602", 7, 14, 1,1,1,1,1); // perhatikan kalau kita maunya 1-based index u/ array
 	room[1] = new Ruang("7603", 7, 14, 1,0,1,0,1);
@@ -55,7 +55,7 @@ Problem::Problem() {
 	course[4] = new Kuliah("IF3110", "7602", 7,  9, 2, 1,1,1,1,1);
 	course[5] = new Kuliah("IF3130", "-",    7, 12, 2, 0,0,1,1,1);
 	course[6] = new Kuliah("IF3170", "7602", 7,  9, 2, 1,1,1,1,1);
-	course[7] = new Kuliah("IF3111", "-",    7, 12, 2, 1,1,1,1,1);*/
+	course[7] = new Kuliah("IF3111", "-",    7, 12, 2, 1,1,1,1,1);
 }
 
 // Ntar dikasih fitur untuk nge-parse juga dari file
@@ -210,11 +210,23 @@ Problem::Problem(const Problem &P) {
 	course = new Kuliah * [nCourses];
 	
 	for(int i = 0; i < nRooms; i++) {
-		room[i] = P.room[i];
+		
+		room[i] = new Ruang(P.room[i]->ruangName, P.room[i]->startHours, P.room[i]->endHours,
+					P.room[i]->availDays[1], P.room[i]->availDays[2], P.room[i]->availDays[3], P.room[i]->availDays[4], P.room[i]->availDays[5]);
 	}
 	for(int i = 0; i < nCourses; i++) {
-		course[i] = P.course[i];
+
+		course[i] = new Kuliah(P.course[i]->kode, P.course[i]->butuhRuang, P.course[i]->start, P.course[i]->end, P.course[i]->duration,
+					P.course[i]->days[1], P.course[i]->days[2], P.course[i]->days[3], P.course[i]->days[4], P.course[i]->days[5]);
+				
+		
+		course[i]->currentRuang = P.course[i]->currentRuang;
+		course[i]->currentRuangIdx = P.course[i]->currentRuangIdx;
+		course[i]->currentStartTime = P.course[i]->currentStartTime;
+		course[i]->currentDay = P.course[i]->currentDay;
+				
 	}
+
 }
 
 Problem::~Problem() {
@@ -223,15 +235,24 @@ Problem::~Problem() {
 }
 
 Problem& Problem::operator= (const Problem &P) {
+	delete [] room;
+	delete [] course;
 	nRooms = P.nRooms; nCourses = P.nCourses;
 	room = new Ruang * [nRooms];
 	course = new Kuliah * [nCourses];
 	
 	for(int i = 0; i < nRooms; i++) {
-		room[i] = P.room[i];
+		room[i] = new Ruang(P.room[i]->ruangName, P.room[i]->startHours, P.room[i]->endHours,
+					P.room[i]->availDays[1], P.room[i]->availDays[2], P.room[i]->availDays[3], P.room[i]->availDays[4], P.room[i]->availDays[5]);
 	}
 	for(int i = 0; i < nCourses; i++) {
-		course[i] = P.course[i];
+		course[i] = new Kuliah(P.course[i]->kode, P.course[i]->butuhRuang, P.course[i]->start, P.course[i]->end, P.course[i]->duration,
+					P.course[i]->days[1], P.course[i]->days[2], P.course[i]->days[3], P.course[i]->days[4], P.course[i]->days[5]);
+	
+		course[i]->currentRuang = P.course[i]->currentRuang;
+		course[i]->currentRuangIdx = P.course[i]->currentRuangIdx;
+		course[i]->currentStartTime = P.course[i]->currentStartTime;
+		course[i]->currentDay = P.course[i]->currentDay;
 	}	
 	return *this;
 }
@@ -338,26 +359,28 @@ void Problem::solveUsingSA(double temperature, double descentRate, int n, int ma
 	while(tempEvalValue > 0 && stepCounter++ < maxSteps) {
 		for(int i = 0; i < n; i++) {
 			tempSolution = modifySolution(*this);
+/*			for(int i=0; i<nCourses; i++) {
+				cout << *tempSolution.course[i] << endl;	
+			}*/
+			
 			int newEvalValue = tempSolution.countConflictCourses();
 			int deltaEval = newEvalValue - tempEvalValue;
 			if(deltaEval < 0) {
 				*this = tempSolution;
 				tempEvalValue = countConflictCourses();
-			} else if (exp(-deltaEval/temperature) > rnd.nextDouble()) {
+			} else if (exp(-deltaEval/max(0.0,temperature)) > rnd.nextDouble()) {
+				cout << "pangkat " << exp(-deltaEval/max(0.0,temperature)) << " " << -deltaEval << " " << temperature << endl;
 				*this = tempSolution;
 				tempEvalValue = countConflictCourses();
 			}
-			cout << "step : " << (stepCounter-1)*10+i << " conflict : " << tempEvalValue << endl;
+			cout << "step : " << (stepCounter-1)*n+i << " conflict : " << tempEvalValue << endl;
 			if(tempEvalValue == 0) break;
 		}
 		temperature -= descentRate;
-		cout << "conflict dalam while " << countConflictCourses() << endl;
 	}
-	cout << "conflict atas for " << countConflictCourses() << endl;
 	for(int i=0; i<nCourses; i++) {
 		cout << *course[i] << endl;	
 	}
-	cout << "conflict " << tempEvalValue << endl;
 }
 
 void Problem::solveUsingHill(int maxRestart) {
@@ -423,7 +446,6 @@ Problem Problem::modifySolution(Problem P) {
 	int randomlyChosenCourse = P.rnd.nextInt(nCourses);
 	int randomlyChosenRoomIdx;
 	int randomlyChosenDay, randomlyChosenStartTime;
-//	cout << "course diubah " << randomlyChosenCourse << endl;
 	do {
 		// Set Ruangan
 		if(P.course[randomlyChosenCourse]->isButuhRuang()) {
@@ -460,7 +482,7 @@ Problem Problem::modifySolution(Problem P) {
 		// Tidak perlu di do..while karena random nya PASTI masuk di range courseBegin dan courseEnd
 	} while (!P.room[randomlyChosenRoomIdx]->isTimeAvail(P.course[randomlyChosenCourse]->currentStartTime,
 			P.course[randomlyChosenCourse]->currentStartTime + P.course[randomlyChosenCourse]->duration)
-			|| !room[randomlyChosenRoomIdx]->isDayAvail(randomlyChosenDay));
+			|| !room[randomlyChosenRoomIdx]->isDayAvail(randomlyChosenDay));	
 	return P;
 }
 
@@ -476,7 +498,6 @@ bool Problem::isSolved() {
 
 int Problem::countConflictCourses() {
 	int count = 0;
-	
 	for(int i=0; i<nCourses-1; i++) {
 		for(int j=i+1; j<nCourses; j++) {
 			if(course[i]->currentRuang == course[j]->currentRuang) {

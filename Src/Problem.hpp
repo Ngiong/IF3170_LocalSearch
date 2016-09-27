@@ -23,7 +23,6 @@ class Problem {
 		Problem modifySolution(Problem P);
 		
 		// Init
-		void fileToVar(string file);
 		void initByRandom();
 		void initByMikir(); /* ================== BERHARAP BANYAK DENGAN METHOD INI ==========================*/
 		// Salah satu yg bisa dipertimbangkan untuk initByMikir adalah menjadikan sebuah matrix terlebih dahulu, 
@@ -133,7 +132,7 @@ Problem::Problem(string file) {
 				}
  				j++;
 			}
-			cout << ruangan << " " << startTime << " " << finishTime << " " << isSenin << " " << isSelasa << " " << isRabu << " " << isKamis << " " << isJumat << endl;
+			//cout << ruangan << " " << startTime << " " << finishTime << " " << isSenin << " " << isSelasa << " " << isRabu << " " << isKamis << " " << isJumat << endl;
 			room[i] = new Ruang(ruangan, startTime, finishTime, isSenin, isSelasa, isRabu, isKamis, isJumat);
 		}
 
@@ -190,7 +189,7 @@ Problem::Problem(string file) {
  				j++;
 			}
 
-			cout << jadwal << " " << ruangan << " " << startTime << " " << finishTime << " " << durasi << " " << isSenin << " " << isSelasa << " " << isRabu << " " << isKamis << " " << isJumat << endl;
+			//cout << jadwal << " " << ruangan << " " << startTime << " " << finishTime << " " << durasi << " " << isSenin << " " << isSelasa << " " << isRabu << " " << isKamis << " " << isJumat << endl;
 			course[i] = new Kuliah(jadwal, ruangan, startTime, finishTime, durasi, isSenin, isSelasa, isRabu, isKamis, isJumat);
 		}
 		myfile.close();
@@ -314,33 +313,45 @@ void Problem::initByRandom() {
 **				PROBLEM SOLVER
 **
 **********************************************/
-void Problem::solveUsingKocokan(int maxSteps) {
-	initByRandom();
-	
-	int stepCounter = 0;
-	while(!isSolved() && stepCounter++ < maxSteps) {
-		// Pilih variabel yg conflict
-		int randomlySelectedVariable = rnd.nextInt(nCourses); 
-		// ** gebleknya.. krn ga kepikiran isConflictingVariable nya gimana implementasinya
-		
-		// Set ulang secara randomly
-		// ** Yg modif adalah : ruangannya, harinya
-		// ** Jam kuliah akan menyesuaikan dengan randomize
-		if(course[randomlySelectedVariable]->isButuhRuang()) { // PASTI HARINYA
-			int randomlyChosenDay;
-			do {
-				randomlyChosenDay = rnd.nextInt(1, 5);	
-			} while(!course[randomlySelectedVariable]->isDayAvail(randomlyChosenDay));
-			course[randomlySelectedVariable]->currentDay = randomlyChosenDay;
+void Problem::solveUsingHill(int maxRestart) {
+	int stepCounter, boundLocal, countRestart = 0, minConflict = 999;
+	Problem tempSolution = *this;
+	Problem minimum;
+	int tempEvalValue, newEvalValue;
+	bool isLocalMinimum;
+	Kuliah ** tempCourse = new Kuliah * [nCourses];
+
+	do {
+		initByRandom();
+		stepCounter = 0;
+		boundLocal = 0;
+		tempEvalValue = countConflictCourses();
+		isLocalMinimum = false;
+		while(isLocalMinimum == false && tempEvalValue>0) {
+			tempSolution = modifySolution(*this);
+			newEvalValue = tempSolution.countConflictCourses();
+			if (newEvalValue < tempEvalValue) {
+				*this = tempSolution;
+				tempEvalValue = countConflictCourses();
+				stepCounter++;
+			}
+			else {
+				if (boundLocal <= 1000) {
+					boundLocal++;
+				}
+				else {
+					isLocalMinimum = true;
+				}
+			}
 		}
-		
-		// Measure performance
-		// *********************** Save it for later ***********************
-	}
-	// isSolved() OR stepCounter >= maxSteps
-	if(stepCounter < maxSteps) cout << "YAY" << endl;
-	else cout << "NAH" << endl;
-	
+		cout << countRestart << " " << countConflictCourses() << " " << minConflict << endl;
+		countRestart++;
+		if (countConflictCourses() < minConflict) {
+			minConflict = countConflictCourses();
+			minimum = *this;
+		}
+	} while (tempEvalValue>0 && countRestart<=maxRestart);
+	*this = minimum;
 	for(int i=0; i<nCourses; i++) {
 		cout << *course[i] << endl;	
 	}
@@ -383,60 +394,33 @@ void Problem::solveUsingSA(double temperature, double descentRate, int n, int ma
 	}
 }
 
-void Problem::solveUsingHill(int maxRestart) {
-	int stepCounter, boundLocal, countRestart = 0, minConflict = 999;
-	Problem tempSolution = *this;
-	Problem minimum;
-	int tempEvalValue, newEvalValue;
-	bool isLocalMinimum;
-	Kuliah ** tempCourse = new Kuliah * [nCourses];
-
-	do {
-		//cout << "Restart" << endl;
-		initByRandom();
-		stepCounter = 0;
-		boundLocal = 0;
-		tempEvalValue = countConflictCourses();
-		//cout << "step : 0 conflict : " << tempEvalValue << endl;
-		isLocalMinimum = false;
-		while(isLocalMinimum == false && tempEvalValue>0) {
-			cout << "sebelum " <<  countConflictCourses() << " " << tempSolution.countConflictCourses() << endl;
-
-			tempSolution = modifySolution(*this);
-			cout << "sesudah " <<  countConflictCourses() << " " << tempSolution.countConflictCourses() << endl;
-			newEvalValue = tempSolution.countConflictCourses();
-			if (newEvalValue < tempEvalValue) {
-
-				cout << this->countConflictCourses() << " alkdsjfalsdkjflskadjflasd;jfl;sd " << tempSolution.countConflictCourses() << " lalal " << tempEvalValue << " " << newEvalValue << endl;
-				*this = tempSolution;
-				tempEvalValue = countConflictCourses();
-				stepCounter++;
-				//cout << "step : " << stepCounter << " conflict : " << tempEvalValue << endl;
-			}
-			else {
-				if (boundLocal <= 1000) {
-					boundLocal++;
-				}
-				else {
-					isLocalMinimum = true;
-					//cout << "conflict terpilih: " << newEvalValue << ", tidak diterima" << endl; 
-				}
-			}
-		}
-		countRestart++;
-		cout << countRestart << " " << countConflictCourses() << " " << minConflict << endl;
-		if (countConflictCourses() < minConflict) {
-			minConflict = countConflictCourses();
-					cout << countConflictCourses() << " zxczxc" << minimum.countConflictCourses() << endl;
+void Problem::solveUsingKocokan(int maxSteps) {
+	initByRandom();
 	
-			minimum = *this;
-
+	int stepCounter = 0;
+	while(!isSolved() && stepCounter++ < maxSteps) {
+		// Pilih variabel yg conflict
+		int randomlySelectedVariable = rnd.nextInt(nCourses); 
+		// ** gebleknya.. krn ga kepikiran isConflictingVariable nya gimana implementasinya
+		
+		// Set ulang secara randomly
+		// ** Yg modif adalah : ruangannya, harinya
+		// ** Jam kuliah akan menyesuaikan dengan randomize
+		if(course[randomlySelectedVariable]->isButuhRuang()) { // PASTI HARINYA
+			int randomlyChosenDay;
+			do {
+				randomlyChosenDay = rnd.nextInt(1, 5);	
+			} while(!course[randomlySelectedVariable]->isDayAvail(randomlyChosenDay));
+			course[randomlySelectedVariable]->currentDay = randomlyChosenDay;
 		}
-		cout << countConflictCourses() << "asdasdas" << minimum.countConflictCourses() << endl;
-	} while (tempEvalValue>0 && countRestart<=maxRestart);
-	cout << countConflictCourses() << " " << minimum.countConflictCourses() << endl;
-	*this = minimum;
-	cout << countConflictCourses() << " " << minimum.countConflictCourses() << endl;
+		
+		// Measure performance
+		// *********************** Save it for later ***********************
+	}
+	// isSolved() OR stepCounter >= maxSteps
+	if(stepCounter < maxSteps) cout << "YAY" << endl;
+	else cout << "NAH" << endl;
+	
 	for(int i=0; i<nCourses; i++) {
 		cout << *course[i] << endl;	
 	}

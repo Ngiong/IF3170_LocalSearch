@@ -13,10 +13,17 @@ int main() {
 	file = "../tc/" + file;
 	//n.fileToVar(file);
 	Problem n(file);
-
-	cout << "yolo"  << endl;
-	n.solveUsingSA(1, 0.01, 10, 120);
-//	n.solveUsingHill(10);
+	cout << "Pilih:" << endl;
+	cout << "1. Hill" << endl;
+	cout << "2. SA" << endl;
+	int pilihan;
+	cout << "Pilihan: "; cin >> pilihan;
+	if (pilihan == 1) {
+		n.solveUsingHill(10);
+	} 
+	else if (pilihan == 2) {
+		n.solveUsingSA(1, 0.01, 10, 120);
+	}
 	int count = n.countConflictCourses();
 	cout << "CONFLICT : " << count << endl;
 	

@@ -38,8 +38,6 @@ class Genetic {
         int nCourseConflict(string, int);
         int nScheduleConflict(string);
 
-        int roomNametoInt(string);
-
         string randString();
         void geneticInit();
 
@@ -57,6 +55,7 @@ class Genetic {
         void solveGA(int);
 
         string getSolutionRoom(int);
+        int getSolutionRoomIdx(int);
         int getSolutionDay(int);
         int getSolutionStartTime(int);
 };
@@ -128,35 +127,16 @@ int Genetic :: nScheduleConflict(string schedule) {
     return conflictCount;
 }
 
-int Genetic :: roomNametoInt(string roomname) {
-    bool found = false;
-    int i=0;
-    while (i < nRuang && !found) {
-        if (rooms[i] -> getName() == roomname) {
-            found = true;
-        } else {
-            i++;
-        }
-    }
-    return i;
-}
-
 string Genetic :: randString() {
     string s = "";
     int slotSpace[nRuang][N_DAY][N_TIME];
     int slotCount;
     for (int i = 0; i < nKuliah; i++) {
         slotCount = 0;
-        int roomIdx;
-        if (courses[i] -> isButuhRuang()) {
-            roomIdx = roomNametoInt(courses[i] -> getButuhRuang());
-        } else {
-            roomIdx = -1;
-        }
         for (int r = 0; r < nRuang; r++) {
             for (int d = 0; d < N_DAY; d++) {
                 for (int t = 0; t < N_TIME; t++) {
-                    if ((roomIdx < 0 || r == roomIdx)
+                    if ((courses[i] -> getButuhRuang() == "-" || courses[i] -> getButuhRuang() == rooms[r] -> getName())
                           && courses[i] -> isDayAvail(d+DELTA_DAY)
                           && rooms[r] -> isDayAvail(d+DELTA_DAY)
                           && courses[i] -> isTimeAvail(t + DELTA_TIME, t + DELTA_TIME + courses[i] -> getDuration())
@@ -351,17 +331,10 @@ void Genetic :: mutateString(string* schedule) {
             int temp = R -> nextInt(nScheduleConflict(*schedule));
             int slotCount = 0;
             if (temp < nCourseConflict(*schedule, i)) {
-                int roomIdx;
-                if (courses[i] -> isButuhRuang()) {
-                    roomIdx = roomNametoInt(courses[i] -> getButuhRuang());
-                } else {
-                    roomIdx = -1;
-                }
-
                 for (int r = 0; r < nRuang; r++) {
                     for (int d = 0; d < N_DAY; d++) {
                         for (int t = 0; t < N_TIME; t++) {
-                            if ((roomIdx < 0 || r == roomIdx)
+                            if ((courses[i] -> getButuhRuang() == "-" || courses[i] -> getButuhRuang() == rooms[r] -> getName())
                                   && courses[i] -> isDayAvail(d+DELTA_DAY)
                                   && rooms[r] -> isDayAvail(d+DELTA_DAY)
                                   && courses[i] -> isTimeAvail(t + DELTA_TIME, t + DELTA_TIME + courses[i] -> getDuration())
@@ -463,6 +436,10 @@ void Genetic :: solveGA(int nCycle) {
 
 string Genetic :: getSolutionRoom(int courseID) {
     return rooms[(int)(bestSolution[4*courseID + 0]) - (int)'a'] -> getName();
+}
+
+int Genetic :: getSolutionRoomIdx(int courseID) {
+    return (int)(bestSolution[4*courseID + 0]) - (int)'a';
 }
 
 int Genetic :: getSolutionDay(int courseID) {

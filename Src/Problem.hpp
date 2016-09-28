@@ -401,7 +401,7 @@ void Problem :: solveUsingGA(int nSample, int nCycle) {
 
     for (int  i = 0; i < nCourses; i++) {
         course[i] -> currentRuang = G->getSolutionRoom(i);
-        course[i] -> currentRuangIdx = G->roomNametoInt(G->getSolutionRoom(i));
+        course[i] -> currentRuangIdx = G->getSolutionRoomIdx(i);
         course[i] -> currentDay = G->getSolutionDay(i);
         course[i] -> currentStartTime = G->getSolutionStartTime(i);
     }

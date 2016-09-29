@@ -4,6 +4,7 @@ using namespace std;
 
 int main() {
 	//Problem n;
+	
 	string file;
 	
 	cout << "********************" << endl;
@@ -19,10 +20,10 @@ int main() {
 	int pilihan;
 	cout << "Pilihan: "; cin >> pilihan;
 	if (pilihan == 1) {
-		n.solveUsingHill(10);
+		n.solveUsingHill(1000);
 	} 
 	else if (pilihan == 2) {
-		n.solveUsingSA(1, 0.01, 10, 120);
+		n.solveUsingSA(2, 0.005, 10, 500);
 	}
 	int count = n.countConflictCourses();
 	cout << "CONFLICT : " << count << endl;

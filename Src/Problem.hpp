@@ -5,6 +5,7 @@
 #include "Kuliah.hpp"
 #include "Ruang.hpp"
 #include "RandomGenerator.hpp"
+#include "Genetic.hpp"
 using namespace std;
 
 class Problem {
@@ -14,24 +15,24 @@ class Problem {
 		Problem(const Problem &P);
 		~Problem();
 		Problem& operator= (const Problem &P);
-		
+
 		// Solver
 		void solveUsingHill(int maxRestart);
 		void solveUsingSA(double, double, int, int);
-		void solveUsingGA();
+		void solveUsingGA(int, int);
 		void solveUsingKocokan(int); // maxSteps
 		Problem modifySolution(Problem P);
-		
+
 		// Init
 		void initByRandom();
 		void initByMikir(); /* ================== BERHARAP BANYAK DENGAN METHOD INI ==========================*/
-		// Salah satu yg bisa dipertimbangkan untuk initByMikir adalah menjadikan sebuah matrix terlebih dahulu, 
+		// Salah satu yg bisa dipertimbangkan untuk initByMikir adalah menjadikan sebuah matrix terlebih dahulu,
 		// lalu melakukan assignment u/ slot-slot yang hanya mungkin di occupy oleh 1 matakuliah
-		
+
 		// Performance Measure
 		bool isSolved();
 		int countConflictCourses();
-		
+
 	private :
 		int nRooms, nCourses;
 		Ruang ** room;
@@ -68,7 +69,7 @@ Problem::Problem(string file) {
 		getline(myfile, line);
 		while (line != "Jadwal") {
 			nRooms++;
-			getline(myfile, line);	
+			getline(myfile, line);
 		}
 		nRooms -= 2;
 		while (getline(myfile, line)) {
@@ -207,9 +208,9 @@ Problem::Problem(const Problem &P) {
 	nRooms = P.nRooms; nCourses = P.nCourses;
 	room = new Ruang * [nRooms];
 	course = new Kuliah * [nCourses];
-	
+
 	for(int i = 0; i < nRooms; i++) {
-		
+
 		room[i] = new Ruang(P.room[i]->ruangName, P.room[i]->startHours, P.room[i]->endHours,
 					P.room[i]->availDays[1], P.room[i]->availDays[2], P.room[i]->availDays[3], P.room[i]->availDays[4], P.room[i]->availDays[5]);
 	}
@@ -217,20 +218,20 @@ Problem::Problem(const Problem &P) {
 
 		course[i] = new Kuliah(P.course[i]->kode, P.course[i]->butuhRuang, P.course[i]->start, P.course[i]->end, P.course[i]->duration,
 					P.course[i]->days[1], P.course[i]->days[2], P.course[i]->days[3], P.course[i]->days[4], P.course[i]->days[5]);
-				
-		
+
+
 		course[i]->currentRuang = P.course[i]->currentRuang;
 		course[i]->currentRuangIdx = P.course[i]->currentRuangIdx;
 		course[i]->currentStartTime = P.course[i]->currentStartTime;
 		course[i]->currentDay = P.course[i]->currentDay;
-				
+
 	}
 
 }
 
 Problem::~Problem() {
 	delete [] room;
-	delete [] course;	
+	delete [] course;
 }
 
 Problem& Problem::operator= (const Problem &P) {
@@ -239,7 +240,7 @@ Problem& Problem::operator= (const Problem &P) {
 	nRooms = P.nRooms; nCourses = P.nCourses;
 	room = new Ruang * [nRooms];
 	course = new Kuliah * [nCourses];
-	
+
 	for(int i = 0; i < nRooms; i++) {
 		room[i] = new Ruang(P.room[i]->ruangName, P.room[i]->startHours, P.room[i]->endHours,
 					P.room[i]->availDays[1], P.room[i]->availDays[2], P.room[i]->availDays[3], P.room[i]->availDays[4], P.room[i]->availDays[5]);
@@ -247,12 +248,12 @@ Problem& Problem::operator= (const Problem &P) {
 	for(int i = 0; i < nCourses; i++) {
 		course[i] = new Kuliah(P.course[i]->kode, P.course[i]->butuhRuang, P.course[i]->start, P.course[i]->end, P.course[i]->duration,
 					P.course[i]->days[1], P.course[i]->days[2], P.course[i]->days[3], P.course[i]->days[4], P.course[i]->days[5]);
-	
+
 		course[i]->currentRuang = P.course[i]->currentRuang;
 		course[i]->currentRuangIdx = P.course[i]->currentRuangIdx;
 		course[i]->currentStartTime = P.course[i]->currentStartTime;
 		course[i]->currentDay = P.course[i]->currentDay;
-	}	
+	}
 	return *this;
 }
 
@@ -279,23 +280,23 @@ void Problem::initByRandom() {
 				randomlyChosenRoomIdx = calonRuangId[rnd.nextInt(k)];
 			}
 			else {
-				randomlyChosenRoomIdx = rnd.nextInt(nRooms);	
+				randomlyChosenRoomIdx = rnd.nextInt(nRooms);
 			}
 			course[i]->currentRuangIdx = randomlyChosenRoomIdx;
 			course[i]->currentRuang = room[randomlyChosenRoomIdx]->ruangName;
-		
+
 
 			// * Set hari dulu
 			do {
-				randomlyChosenDay = rnd.nextInt(1, 5);	
+				randomlyChosenDay = rnd.nextInt(1, 5);
 			} while(!course[i]->isDayAvail(randomlyChosenDay));
-			course[i]->currentDay = randomlyChosenDay; 
+			course[i]->currentDay = randomlyChosenDay;
 			// Sayangnya : ini bisa kebobol kalo Ruangannya ga available
 			// Tapi itulah LOCAL SEARCH, sering dibiarin aja salah duluan, ntar akhir2nya jadi bener...
-			
+
 			// * Set waktu
-			int courseBegin = course[i]->getStartTime(), 
-				courseEnd = course[i]->getEndTime(), 
+			int courseBegin = course[i]->getStartTime(),
+				courseEnd = course[i]->getEndTime(),
 				courseDuration = course[i]->getDuration();
 			randomlyChosenStartTime = rnd.nextInt(courseBegin, courseEnd-courseDuration);
 			course[i]->currentStartTime = randomlyChosenStartTime;
@@ -303,8 +304,8 @@ void Problem::initByRandom() {
 		} while (!room[randomlyChosenRoomIdx]->isTimeAvail(course[i]->currentStartTime, course[i]->currentStartTime + course[i]->duration)
 				|| !room[randomlyChosenRoomIdx]->isDayAvail(randomlyChosenDay));
 		// do while sampe dapet Ruang yang available;
-		
-		
+
+
 		// ** Bisa juga alternatifnya, set hari dan waktu bersamaan
 	}
 }
@@ -353,14 +354,14 @@ void Problem::solveUsingHill(int maxRestart) {
 	} while (tempEvalValue>0 && countRestart<=maxRestart);
 	*this = minimum;
 	for(int i=0; i<nCourses; i++) {
-		cout << *course[i] << endl;	
+		cout << *course[i] << endl;
 	}
 }
 
 void Problem::solveUsingSA(double temperature, double descentRate, int n, int maxSteps) {
 	initByRandom();
 	for(int i=0; i<nCourses; i++) {
-		cout << *course[i] << endl;	
+		cout << *course[i] << endl;
 	}
 
 	int stepCounter = 0;
@@ -371,9 +372,9 @@ void Problem::solveUsingSA(double temperature, double descentRate, int n, int ma
 		for(int i = 0; i < n; i++) {
 			tempSolution = modifySolution(*this);
 /*			for(int i=0; i<nCourses; i++) {
-				cout << *tempSolution.course[i] << endl;	
+				cout << *tempSolution.course[i] << endl;
 			}*/
-			
+
 			int newEvalValue = tempSolution.countConflictCourses();
 			int deltaEval = newEvalValue - tempEvalValue;
 			if(deltaEval < 0) {
@@ -390,39 +391,55 @@ void Problem::solveUsingSA(double temperature, double descentRate, int n, int ma
 		temperature -= descentRate;
 	}
 	for(int i=0; i<nCourses; i++) {
-		cout << *course[i] << endl;	
+		cout << *course[i] << endl;
 	}
+}
+
+void Problem :: solveUsingGA(int nSample, int nCycle) {
+    Genetic* G = new Genetic(room, course, nSample, nRooms, nCourses);
+    G -> solveGA(nCycle);
+
+    for (int  i = 0; i < nCourses; i++) {
+        course[i] -> currentRuang = G->getSolutionRoom(i);
+        course[i] -> currentRuangIdx = G->getSolutionRoomIdx(i);
+        course[i] -> currentDay = G->getSolutionDay(i);
+        course[i] -> currentStartTime = G->getSolutionStartTime(i);
+    }
+    delete G;
+    for (int i = 0; i < nCourses; i++) {
+        cout << *course[i] << endl;
+    }
 }
 
 void Problem::solveUsingKocokan(int maxSteps) {
 	initByRandom();
-	
+
 	int stepCounter = 0;
 	while(!isSolved() && stepCounter++ < maxSteps) {
 		// Pilih variabel yg conflict
-		int randomlySelectedVariable = rnd.nextInt(nCourses); 
+		int randomlySelectedVariable = rnd.nextInt(nCourses);
 		// ** gebleknya.. krn ga kepikiran isConflictingVariable nya gimana implementasinya
-		
+
 		// Set ulang secara randomly
 		// ** Yg modif adalah : ruangannya, harinya
 		// ** Jam kuliah akan menyesuaikan dengan randomize
 		if(course[randomlySelectedVariable]->isButuhRuang()) { // PASTI HARINYA
 			int randomlyChosenDay;
 			do {
-				randomlyChosenDay = rnd.nextInt(1, 5);	
+				randomlyChosenDay = rnd.nextInt(1, 5);
 			} while(!course[randomlySelectedVariable]->isDayAvail(randomlyChosenDay));
 			course[randomlySelectedVariable]->currentDay = randomlyChosenDay;
 		}
-		
+
 		// Measure performance
 		// *********************** Save it for later ***********************
 	}
 	// isSolved() OR stepCounter >= maxSteps
 	if(stepCounter < maxSteps) cout << "YAY" << endl;
 	else cout << "NAH" << endl;
-	
+
 	for(int i=0; i<nCourses; i++) {
-		cout << *course[i] << endl;	
+		cout << *course[i] << endl;
 	}
 }
 
@@ -448,25 +465,25 @@ Problem Problem::modifySolution(Problem P) {
 		}
 		P.course[randomlyChosenCourse]->currentRuangIdx = randomlyChosenRoomIdx;
 		P.course[randomlyChosenCourse]->currentRuang = room[randomlyChosenRoomIdx]->ruangName;
-	
+
 		// * Set hari dulu
 		do {
-			randomlyChosenDay = P.rnd.nextInt(1, 5);	
+			randomlyChosenDay = P.rnd.nextInt(1, 5);
 		} while(!P.course[randomlyChosenCourse]->isDayAvail(randomlyChosenDay));
-		P.course[randomlyChosenCourse]->currentDay = randomlyChosenDay; 
+		P.course[randomlyChosenCourse]->currentDay = randomlyChosenDay;
 		// Sayangnya : ini bisa kebobol kalo Ruangannya ga available
 		// Tapi itulah LOCAL SEARCH, sering dibiarin aja salah duluan, ntar akhir2nya jadi bener...
-		
+
 		// * Set waktu
-		int courseBegin = P.course[randomlyChosenCourse]->getStartTime(), 
-			courseEnd = P.course[randomlyChosenCourse]->getEndTime(), 
+		int courseBegin = P.course[randomlyChosenCourse]->getStartTime(),
+			courseEnd = P.course[randomlyChosenCourse]->getEndTime(),
 			courseDuration = P.course[randomlyChosenCourse]->getDuration();
 		randomlyChosenStartTime = P.rnd.nextInt(courseBegin, courseEnd-courseDuration);
 		P.course[randomlyChosenCourse]->currentStartTime = randomlyChosenStartTime;
 		// Tidak perlu di do..while karena random nya PASTI masuk di range courseBegin dan courseEnd
 	} while (!P.room[randomlyChosenRoomIdx]->isTimeAvail(P.course[randomlyChosenCourse]->currentStartTime,
 			P.course[randomlyChosenCourse]->currentStartTime + P.course[randomlyChosenCourse]->duration)
-			|| !room[randomlyChosenRoomIdx]->isDayAvail(randomlyChosenDay));	
+			|| !room[randomlyChosenRoomIdx]->isDayAvail(randomlyChosenDay));
 	return P;
 }
 

@@ -6,7 +6,7 @@ int main() {
 	//Problem n;
 	
 	string file;
-	
+
 	cout << "********************" << endl;
 	cout << "*** LOCAL SEARCH ***" << endl;
 	cout << "********************" << endl << endl;
@@ -17,6 +17,7 @@ int main() {
 	cout << "Pilih:" << endl;
 	cout << "1. Hill" << endl;
 	cout << "2. SA" << endl;
+	cout << "3. GA" << endl;
 	int pilihan;
 	cout << "Pilihan: "; cin >> pilihan;
 	if (pilihan == 1) {
@@ -24,10 +25,13 @@ int main() {
 	} 
 	else if (pilihan == 2) {
 		n.solveUsingSA(2, 0.005, 10, 500);
+	} 
+	else if (pilihan == 3) {
+        n.solveUsingGA(64, 100);
 	}
 	int count = n.countConflictCourses();
 	cout << "CONFLICT : " << count << endl;
-	
+
 	////////////////////////////////////////////////////
 	//////////// Bagian GUI ////////////////////////////
 	////////////////////////////////////////////////////
@@ -40,7 +44,7 @@ int main() {
 	cout << "<title>Course Scheduling</title>" << endl;
 	cout << "<link href=\"drag.css\" rel=\"stylesheet\" /> " << endl;
 	cout << "</head>" << endl;
-	
+
 	cout << "<body>" << endl;
 	cout << "<p><H1>COURSE SCHEDULING AI</H1></p>" << endl;
 	cout << "<p>Select the Algorithm : </p>" << endl;
@@ -50,7 +54,7 @@ int main() {
 	cout << "<input type = \"radio\" name = \"algo\" value = \"GeneticAlgorithm\"> Genetic Algorithm <br><br>" << endl;
 	cout << "<input type = \"submit\" name = \"submit\" value = \"Solve\" >" << endl;
 	cout << "</forms>" << endl;
-	
+
 	cout << "<br><br><br>" << endl;
 	cout << "<h2 class=\"schedule\">Schedule Table</h2>" << endl;
 	cout << "<div id = \"columns\"> " << endl;

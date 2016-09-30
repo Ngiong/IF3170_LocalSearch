@@ -103,8 +103,8 @@ Genetic :: Genetic(Ruang** room, Kuliah** course, int n, int nrooms, int ncourse
 }
 
 Genetic :: ~Genetic() {
-    delete solutionSample;
-    delete R;
+    delete[] solutionSample;
+    delete[] R;
 }
 
 int Genetic :: getRoom(string schedule, int courseID) {

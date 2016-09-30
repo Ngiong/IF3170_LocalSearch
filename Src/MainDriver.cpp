@@ -22,20 +22,19 @@ int main()
 	cout<<"<link href=\"drag.css\" rel=\"stylesheet\"/>"<<endl;
 	cout<<"</head>"<<endl;
 	cout<<"<body>"<<endl;
-	cout << "<p><H1>COURSE SCHEDULING AI</H1></p>" << endl;
+	cout << "<p><H1 style=\"font-family: Helvetica;color:blue;border-bottom: 1px solid;margin-bottom: 10px;\">COURSE SCHEDULING AI</H1></p>" << endl;
 	cout << "<p>Select the Algorithm : </p>" << endl;
 	cout<<"<form method=\"get\">"<<endl;
 	cout << "<input type = \"radio\" name = \"algo\" value = \"HillClimbing\" checked= \"checked\"> Hill Climbing <br>" << endl;
 	cout << "<input type = \"radio\" name = \"algo\" value = \"SimulatedAnnealing\"> Simulated Annealing <br>" << endl;
 	cout << "<input type = \"radio\" name = \"algo\" value = \"GeneticAlgorithm\"> Genetic Algorithm <br><br>" << endl;
 	cout << "<p>Browse File: <input type=\"file\" name=\"userfile\" /></p>"<<endl;
-	cout<<" <input type=\"submit\" value=\"Solve\" />"<<endl;
-	cout<<"</form><br />"<<endl;
- 	
+	cout<<"<input type=\"submit\" value=\"Solve\" style=\"background-color: #0080ff;border: none;color: white;padding: 10px 27px;text-align: center;text-decoration: none;display: inline-block;font-size: 14px;margin: 4px 2px;cursor: pointer;\" />"<<endl;
+	cout<<"</form>"<<endl;
  	
 	if (Get.find("algo")!=Get.end() && Get.find("userfile")!=Get.end()) {
 		string file = Get["userfile"];
-		file = "tc/" + file;
+		file = "../tc/" + file;
 		// Buat testing
 		/*
 		cout<<"<p>File path that you loaded   : "<<file<<"</p>"<<endl;
@@ -138,8 +137,8 @@ int main()
 						k = 4;
 					else
 						k = 5;
-					if(temp[n.getKuliah(j).getCurrentStartTime()][k].kodekuliah == "-")
-						temp[n.getKuliah(j).getCurrentStartTime()][k].kodekuliah = n.getKuliah(j).getKode();
+					if(temp[n.getKuliah(j).getCurrentStartTime()-6][k].kodekuliah == "-")
+						temp[n.getKuliah(j).getCurrentStartTime()-6][k].kodekuliah = n.getKuliah(j).getKode();
 					else {
 						arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
 						bentrokIterator++;
@@ -148,7 +147,7 @@ int main()
 					if(n.getKuliah(j).getDuration() > 1) {
 						int duration = n.getKuliah(j).getDuration();
 						duration -= 1;
-						for(int a = n.getKuliah(j).getCurrentStartTime(); a <= n.getKuliah(j).getCurrentStartTime() + duration; a++){
+						for(int a = n.getKuliah(j).getCurrentStartTime()-6; a <= n.getKuliah(j).getCurrentStartTime()-6 + duration; a++){
 							temp[a][k].kodekuliah = n.getKuliah(j).getKode();
 						}
 					}
@@ -192,7 +191,7 @@ int main()
 		cout << "<script src=\"drag.js\" type=\"text/javascript\"></script>" << endl;
 	} 
 	else {
-		cout << "Fill up the above from and press solve" <<endl;
+		cout <<"<p style=\"font-family: Arial;\"><b>Fill up the form above and press solve<b></p>" <<endl;
 	}
 	cout<<"</body>"<<endl;
 	cout<<"</html>"<<endl;

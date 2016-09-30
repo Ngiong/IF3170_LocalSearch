@@ -1,122 +1,201 @@
 #include <bits/stdc++.h>
+#include <map>
+#include "getpost.h"
 #include "Problem.hpp"
+ 
 using namespace std;
 
-int main() {
-	//Problem n;
-	string file;
-
-	cout << "********************" << endl;
-	cout << "*** LOCAL SEARCH ***" << endl;
-	cout << "********************" << endl << endl;
-	cout << "Masukkan testcase: "; cin >> file;
-	file = "../tc/" + file;
-	//n.fileToVar(file);
-	Problem n(file);
-	cout << "Pilih:" << endl;
-	cout << "1. Hill" << endl;
-	cout << "2. SA" << endl;
-	cout << "3. GA" << endl;
-	int pilihan;
-	cout << "Pilihan: "; cin >> pilihan;
-	if (pilihan == 1) {
-		n.solveUsingHill(10);
-	}
-	else if (pilihan == 2) {
-		n.solveUsingSA(1, 0.01, 10, 120);
-	} else if (pilihan == 3) {
-        n.solveUsingGA(64, 100);
-	}
-	int count = n.countConflictCourses();
-	cout << "CONFLICT : " << count << endl;
-
-	////////////////////////////////////////////////////
-	//////////// Bagian GUI ////////////////////////////
-	////////////////////////////////////////////////////
-	//* kalo mw ngetes, pindahin semua filenya ke xampp/htdocs terus compile : g++ MainDriver.cpp -o MainDriver.cgi -std=c++11
-	//* ati2 kalo cout di terminal, kode dibawah ini di comment dulu jng lupa wkwk
-	/*
+typedef struct {
+	string kodekuliah;
+	int jammulai;
+	int jamselesai;
+} Hasil;
+ 
+int main()
+{
+	map<string,string> Get;
+	initializeGet(Get); //notice that the variable is passed by reference!
 	cout<<"Content-type: text/html"<<endl<<endl;
-	cout <<"<html>"<<endl;
-	cout << "<head>" << endl;
-	cout << "<title>Course Scheduling</title>" << endl;
-	cout << "<link href=\"drag.css\" rel=\"stylesheet\" /> " << endl;
-	cout << "</head>" << endl;
-
-	cout << "<body>" << endl;
+	cout<<"<html>"<<endl;
+	cout<<"<head>"<<endl;
+	cout<<"<title>AI Course Scheduling</title>"<<endl;
+	cout<<"<link href=\"drag.css\" rel=\"stylesheet\"/>"<<endl;
+	cout<<"</head>"<<endl;
+	cout<<"<body>"<<endl;
 	cout << "<p><H1>COURSE SCHEDULING AI</H1></p>" << endl;
 	cout << "<p>Select the Algorithm : </p>" << endl;
-	cout << "<forms>" << endl;
-	cout << "<input type = \"radio\" name = \"algo\" value = \"HillClimbing\"> Hill Climbing <br>" << endl;
+	cout<<"<form method=\"get\">"<<endl;
+	cout << "<input type = \"radio\" name = \"algo\" value = \"HillClimbing\" checked= \"checked\"> Hill Climbing <br>" << endl;
 	cout << "<input type = \"radio\" name = \"algo\" value = \"SimulatedAnnealing\"> Simulated Annealing <br>" << endl;
 	cout << "<input type = \"radio\" name = \"algo\" value = \"GeneticAlgorithm\"> Genetic Algorithm <br><br>" << endl;
-	cout << "<input type = \"submit\" name = \"submit\" value = \"Solve\" >" << endl;
-	cout << "</forms>" << endl;
-
-	cout << "<br><br><br>" << endl;
-	cout << "<h2 class=\"schedule\">Schedule Table</h2>" << endl;
-	cout << "<div id = \"columns\"> " << endl;
-	cout << "<h2><pre>       Senin              Selasa              Rabu               Kamis               Jumat</pre></h2>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>A</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>B</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>C</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>D</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>E</header></div><br><br><br>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>F</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>G</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>H</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>I</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>J</header></div><br><br><br>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>K</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>L</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>M</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>N</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>O</header></div><br><br><br>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>P</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>Q</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>R</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>S</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>T</header></div><br><br><br>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>U</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>V</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>W</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>X</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>Y</header></div><br><br><br>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>Z</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AA</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AB</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AC</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AD</header></div><br><br><br>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AE</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AF</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AG</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AH</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AI</header></div><br><br><br>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AJ</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AK</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AL</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AM</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AN</header></div><br><br><br>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AO</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AP</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AQ</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AR</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AS</header></div><br><br><br>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AT</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AU</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AV</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AW</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AX</header></div><br><br><br>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AY</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>AZ</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>BA</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>BB</header></div>" << endl;
-	cout << "<div class=\"column\" draggable=\"true\"><header>BC</header></div><br><br><br>" << endl;
-	cout << "<div>" << endl;
-	cout << "<script src=\"drag.js\" type=\"text/javascript\"></script>" << endl;
-	cout << "</body>" << endl;
-	cout << "</html>" << endl;
-	*/
+	cout << "<p>Browse File: <input type=\"file\" name=\"userfile\" /></p>"<<endl;
+	cout<<" <input type=\"submit\" value=\"Solve\" />"<<endl;
+	cout<<"</form><br />"<<endl;
+ 	
+ 	
+	if (Get.find("algo")!=Get.end() && Get.find("userfile")!=Get.end()) {
+		string file = Get["userfile"];
+		file = "tc/" + file;
+		// Buat testing
+		/*
+		cout<<"<p>File path that you loaded   : "<<file<<"</p>"<<endl;
+		cout<<"<p>Algorithm that you selected : "<<Get["algo"]<<"</p>"<<endl;*/
+		Problem n(file);
+		if(Get["algo"] == "HillClimbing"){
+			n.solveUsingHill(10);
+		} else if(Get["algo"] == "SimulatedAnnealing"){
+			n.solveUsingSA(1, 0.01, 10, 120);
+		} else {
+			n.solveUsingGA(64, 100);	
+		} 
+		
+		cout << "<br>" << endl;
+		cout << "<h2 class=\"schedule\">Result</h2>" << endl;
+		cout << "<br><br>" << endl;
+		int T = n.getNRoom();
+		// ini buat nampung bentrok nya
+		Hasil arrBentrok[n.getNCourse()];
+		int bentrokIterator = 0;
+		 
+		for(int i = 0; i < T; i++){
+			string RoomName = n.getRuang(i).getName();			
+			cout << "<h3 class=\"schedule\">" << RoomName << "</h3>" << endl;
+			Hasil temp[12][6];
+			cout << "<div id = \"columns\"> " << endl;
+			
+			//init array penampung
+			temp[0][0].kodekuliah = "Jam / Hari";
+			temp[0][0].jammulai = 0;
+			temp[0][0].jamselesai = 0;
+			temp[0][1].kodekuliah = "Senin";
+			temp[0][1].jammulai = 0;
+			temp[0][1].jamselesai = 0;
+			temp[0][2].kodekuliah = "Selasa";
+			temp[0][2].jammulai = 0;
+			temp[0][2].jamselesai = 0;
+			temp[0][3].kodekuliah = "Rabu";
+			temp[0][3].jammulai = 0;
+			temp[0][3].jamselesai = 0;
+			temp[0][4].kodekuliah = "Kamis";
+			temp[0][4].jammulai = 0;
+			temp[0][4].jamselesai = 0;
+			temp[0][5].kodekuliah = "Jumat";
+			temp[0][5].jammulai = 0;
+			temp[0][5].jamselesai = 0;
+			
+			temp[1][0].kodekuliah = "07.00";
+			temp[1][0].jammulai = 0;
+			temp[1][0].jamselesai = 0;
+			temp[2][0].kodekuliah = "08.00";
+			temp[2][0].jammulai = 0;
+			temp[2][0].jamselesai = 0;
+			temp[3][0].kodekuliah = "09.00";
+			temp[3][0].jammulai = 0;
+			temp[3][0].jamselesai = 0;
+			temp[4][0].kodekuliah = "10.00";
+			temp[4][0].jammulai = 0;
+			temp[4][0].jamselesai = 0;
+			temp[5][0].kodekuliah = "11.00";
+			temp[5][0].jammulai = 0;
+			temp[5][0].jamselesai = 0;
+			temp[6][0].kodekuliah = "12.00";
+			temp[6][0].jammulai = 0;
+			temp[6][0].jamselesai = 0;
+			temp[7][0].kodekuliah = "13.00";
+			temp[7][0].jammulai = 0;
+			temp[7][0].jamselesai = 0;
+			temp[8][0].kodekuliah = "14.00";
+			temp[8][0].jammulai = 0;
+			temp[8][0].jamselesai = 0;
+			temp[9][0].kodekuliah = "15.00";
+			temp[9][0].jammulai = 0;
+			temp[9][0].jamselesai = 0;
+			temp[10][0].kodekuliah = "16.00";
+			temp[10][0].jammulai = 0;
+			temp[10][0].jamselesai = 0;
+			temp[11][0].kodekuliah = "17.00";
+			temp[11][0].jammulai = 0;
+			temp[11][0].jamselesai = 0;
+			for(int i = 1; i < 12; i++){
+				for(int j = 1; j < 6; j++){
+					temp[i][j].kodekuliah = "-";
+					temp[i][j].jammulai = 0;
+					temp[i][j].jamselesai = 0;
+				}
+			}
+			
+			// mulai baca setiap mata kuliah
+			for(int j = 0; j < n.getNCourse(); j++){
+				if(n.getKuliah(j).getCurrentRuang() == RoomName){
+					int k;
+					if(n.getKuliah(j).getCurrentDay() == 1)
+						k = 1;
+					else if(n.getKuliah(j).getCurrentDay() == 2)
+						k = 2;
+					else if(n.getKuliah(j).getCurrentDay() == 3)
+						k = 3;
+					else if(n.getKuliah(j).getCurrentDay() == 4)
+						k = 4;
+					else
+						k = 5;
+					if(temp[n.getKuliah(j).getCurrentStartTime()][k].kodekuliah == "-")
+						temp[n.getKuliah(j).getCurrentStartTime()][k].kodekuliah = n.getKuliah(j).getKode();
+					else {
+						arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
+						bentrokIterator++;
+					}
+					// check duration
+					if(n.getKuliah(j).getDuration() > 1) {
+						int duration = n.getKuliah(j).getDuration();
+						duration -= 1;
+						for(int a = n.getKuliah(j).getCurrentStartTime(); a <= n.getKuliah(j).getCurrentStartTime() + duration; a++){
+							temp[a][k].kodekuliah = n.getKuliah(j).getKode();
+						}
+					}
+				}
+			}
+			
+			// nge cout disini 
+			for(int b = 0; b < 12; b++){
+				if(b == 0){
+					for(int c = 0; c < 6; c++){
+						if(c == 5){
+							cout << "<div class=\"column\" draggable=\"false\"><header>"<<temp[b][c].kodekuliah<<"</header></div>" << endl;
+							cout << "<br><br>" << endl;	
+						} 
+						else 
+							cout << "<div class=\"column\" draggable=\"false\"><header>"<<temp[b][c].kodekuliah<<"</header></div>" << endl;
+					}
+				} 
+				else {
+					for(int c = 0; c < 6; c++){
+						if(c == 0){
+							cout << "<div class=\"column\" draggable=\"false\"><header>"<<temp[b][c].kodekuliah<<"</header></div>" << endl;
+						} else if(c == 5){
+							cout << "<div class=\"column\" draggable=\"true\"><header>"<<temp[b][c].kodekuliah<<"</header></div>" << endl;
+							cout << "<br><br>" << endl;	
+						} 
+						else 
+							cout << "<div class=\"column\" draggable=\"true\"><header>"<<temp[b][c].kodekuliah<<"</header></div>" << endl;
+					}
+				}
+			}
+		}
+		// buat bentrok
+		cout << "<h3 class=\"schedule\">Bentrok</h3>" << endl;
+		if(bentrokIterator >= 1){
+			for(int d = 0; d < bentrokIterator; d++){
+				cout << "<div class=\"column\" draggable=\"true\"><header>"<<arrBentrok[d].kodekuliah<<"</header></div>" << endl;
+			}
+		} else cout << "<p>Tidak ada Bentrok pada Jadwal</p>" << endl;
+		
+		cout << "<script src=\"drag.js\" type=\"text/javascript\"></script>" << endl;
+	} 
+	else {
+		cout << "Fill up the above from and press solve" <<endl;
+	}
+	cout<<"</body>"<<endl;
+	cout<<"</html>"<<endl;
+ 
 	return 0;
 }
-

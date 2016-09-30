@@ -32,7 +32,22 @@ class Problem {
 		// Performance Measure
 		bool isSolved();
 		int countConflictCourses();
-
+		Ruang& getRuang(int i){
+			return *room[i];
+		}
+		
+		Kuliah& getKuliah(int i){
+			return *course[i];
+		}
+		
+		int getNRoom() {
+			return nRooms;
+		}
+		
+		int getNCourse(){
+			return nCourses;
+		}
+		
 	private :
 		int nRooms, nCourses;
 		Ruang ** room;
@@ -345,7 +360,7 @@ void Problem::solveUsingHill(int maxRestart) {
 				}
 			}
 		}
-		cout << countRestart << " " << countConflictCourses() << " " << minConflict << endl;
+		//cout << countRestart << " " << countConflictCourses() << " " << minConflict << endl;
 		countRestart++;
 		if (countConflictCourses() < minConflict) {
 			minConflict = countConflictCourses();
@@ -353,16 +368,16 @@ void Problem::solveUsingHill(int maxRestart) {
 		}
 	} while (tempEvalValue>0 && countRestart<=maxRestart);
 	*this = minimum;
-	for(int i=0; i<nCourses; i++) {
+	/*for(int i=0; i<nCourses; i++) {
 		cout << *course[i] << endl;
-	}
+	}*/
 }
 
 void Problem::solveUsingSA(double temperature, double descentRate, int n, int maxSteps) {
 	initByRandom();
-	for(int i=0; i<nCourses; i++) {
+	/*for(int i=0; i<nCourses; i++) {
 		cout << *course[i] << endl;
-	}
+	}*/
 
 	int stepCounter = 0;
 	Problem tempSolution = *this;
@@ -381,18 +396,18 @@ void Problem::solveUsingSA(double temperature, double descentRate, int n, int ma
 				*this = tempSolution;
 				tempEvalValue = countConflictCourses();
 			} else if (exp(-deltaEval/max(0.0,temperature)) > rnd.nextDouble()) {
-				cout << "pangkat " << exp(-deltaEval/max(0.0,temperature)) << " " << -deltaEval << " " << temperature << endl;
+				//cout << "pangkat " << exp(-deltaEval/max(0.0,temperature)) << " " << -deltaEval << " " << temperature << endl;
 				*this = tempSolution;
 				tempEvalValue = countConflictCourses();
 			}
-			cout << "step : " << (stepCounter-1)*n+i << " conflict : " << tempEvalValue << endl;
+			//cout << "step : " << (stepCounter-1)*n+i << " conflict : " << tempEvalValue << endl;
 			if(tempEvalValue == 0) break;
 		}
 		temperature -= descentRate;
 	}
-	for(int i=0; i<nCourses; i++) {
+	/*for(int i=0; i<nCourses; i++) {
 		cout << *course[i] << endl;
-	}
+	}*/
 }
 
 void Problem :: solveUsingGA(int nSample, int nCycle) {
@@ -406,9 +421,9 @@ void Problem :: solveUsingGA(int nSample, int nCycle) {
         course[i] -> currentStartTime = G->getSolutionStartTime(i);
     }
     delete G;
-    for (int i = 0; i < nCourses; i++) {
+    /*for (int i = 0; i < nCourses; i++) {
         cout << *course[i] << endl;
-    }
+    }*/
 }
 
 void Problem::solveUsingKocokan(int maxSteps) {

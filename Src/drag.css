@@ -35,13 +35,7 @@
   text-shadow: #000 0 1px;
   box-shadow: 5px;
   padding: 5px;
-  background: -moz-linear-gradient(left center, rgb(0,0,0), rgb(79,79,79), rgb(21,21,21));
-  background: -webkit-gradient(linear, left top, right top,
-                               color-stop(0, rgb(0,0,0)),
-                               color-stop(0.50, rgb(79,79,79)),
-                               color-stop(1, rgb(21,21,21)));
-  background: -webkit-linear-gradient(left center, rgb(0,0,0), rgb(79,79,79), rgb(21,21,21));
-  background: -ms-linear-gradient(left center, rgb(0,0,0), rgb(79,79,79), rgb(21,21,21));
+  background-color: #000000;
   border-bottom: 1px solid #ddd;
   -webkit-border-top-left-radius: 10px;
   -moz-border-radius-topleft: 10px;

@@ -9,6 +9,7 @@ typedef struct {
 	string kodekuliah;
 	int jammulai;
 	int jamselesai;
+	int idkuliah;
 } Hasil;
  
 int main()
@@ -43,7 +44,8 @@ int main()
 		if(Get["algo"] == "HillClimbing"){
 			n.solveUsingHill(10);
 		} else if(Get["algo"] == "SimulatedAnnealing"){
-			n.solveUsingSA(1, 0.01, 10, 120);
+			// n.solveUsingSA(1, 0.01, 10, 120);
+			n.solveUsingSA(10, 0.004, 35, 2600);
 		} else {
 			n.solveUsingGA(64, 100);	
 		} 
@@ -66,60 +68,78 @@ int main()
 			temp[0][0].kodekuliah = "Jam / Hari";
 			temp[0][0].jammulai = 0;
 			temp[0][0].jamselesai = 0;
+			temp[0][0].idkuliah = 0;
 			temp[0][1].kodekuliah = "Senin";
 			temp[0][1].jammulai = 0;
 			temp[0][1].jamselesai = 0;
+			temp[0][1].idkuliah = 0;
 			temp[0][2].kodekuliah = "Selasa";
 			temp[0][2].jammulai = 0;
 			temp[0][2].jamselesai = 0;
+			temp[0][2].idkuliah = 0;
 			temp[0][3].kodekuliah = "Rabu";
 			temp[0][3].jammulai = 0;
 			temp[0][3].jamselesai = 0;
+			temp[0][3].idkuliah = 0;
 			temp[0][4].kodekuliah = "Kamis";
 			temp[0][4].jammulai = 0;
 			temp[0][4].jamselesai = 0;
+			temp[0][4].idkuliah = 0;
 			temp[0][5].kodekuliah = "Jumat";
 			temp[0][5].jammulai = 0;
 			temp[0][5].jamselesai = 0;
+			temp[0][5].idkuliah = 0;
 			
 			temp[1][0].kodekuliah = "07.00";
 			temp[1][0].jammulai = 0;
 			temp[1][0].jamselesai = 0;
+			temp[1][0].idkuliah = 0;
 			temp[2][0].kodekuliah = "08.00";
 			temp[2][0].jammulai = 0;
 			temp[2][0].jamselesai = 0;
+			temp[2][0].idkuliah = 0;
 			temp[3][0].kodekuliah = "09.00";
 			temp[3][0].jammulai = 0;
 			temp[3][0].jamselesai = 0;
+			temp[3][0].idkuliah = 0;
 			temp[4][0].kodekuliah = "10.00";
 			temp[4][0].jammulai = 0;
 			temp[4][0].jamselesai = 0;
+			temp[4][0].idkuliah = 0;
 			temp[5][0].kodekuliah = "11.00";
 			temp[5][0].jammulai = 0;
 			temp[5][0].jamselesai = 0;
+			temp[5][0].idkuliah = 0;
 			temp[6][0].kodekuliah = "12.00";
 			temp[6][0].jammulai = 0;
 			temp[6][0].jamselesai = 0;
+			temp[6][0].idkuliah = 0;
 			temp[7][0].kodekuliah = "13.00";
 			temp[7][0].jammulai = 0;
 			temp[7][0].jamselesai = 0;
+			temp[7][0].idkuliah = 0;
 			temp[8][0].kodekuliah = "14.00";
 			temp[8][0].jammulai = 0;
 			temp[8][0].jamselesai = 0;
+			temp[8][0].idkuliah = 0;
 			temp[9][0].kodekuliah = "15.00";
 			temp[9][0].jammulai = 0;
 			temp[9][0].jamselesai = 0;
+			temp[9][0].idkuliah = 0;
 			temp[10][0].kodekuliah = "16.00";
 			temp[10][0].jammulai = 0;
 			temp[10][0].jamselesai = 0;
+			temp[10][0].idkuliah = 0;
 			temp[11][0].kodekuliah = "17.00";
 			temp[11][0].jammulai = 0;
 			temp[11][0].jamselesai = 0;
+			temp[11][0].idkuliah = 0;
 			for(int i = 1; i < 12; i++){
 				for(int j = 1; j < 6; j++){
 					temp[i][j].kodekuliah = "-";
 					temp[i][j].jammulai = 0;
 					temp[i][j].jamselesai = 0;
+					temp[i][j].idkuliah = 0;
 				}
 			}
 			
@@ -149,7 +169,12 @@ int main()
 						duration -= 1;
 						for(int a = n.getKuliah(j).getCurrentStartTime()-6; a <= n.getKuliah(j).getCurrentStartTime()-6 + duration; a++){
 							temp[a][k].kodekuliah = n.getKuliah(j).getKode();
+							temp[a][k].idkuliah = j+1;
 						}
+					}
+					else
+					{
+						temp[n.getKuliah(j).getCurrentStartTime()-6][k].idkuliah = j+1;
 					}
 				}
 			}
@@ -158,30 +183,33 @@ int main()
 			for(int b = 0; b < 12; b++){
 				if(b == 0){
 					for(int c = 0; c < 6; c++){
+						int colour = (temp[b][c].idkuliah)*16384;
 						if(c == 5){
-							cout << "<div class=\"column\" draggable=\"false\"><header>"<<temp[b][c].kodekuliah<<"</header></div>" << endl;
+							cout << "<div class=\"column\" draggable=\"false\"><header style=\"background-color:" << colour << "\">" <<temp[b][c].kodekuliah<<"</header></div>" << endl;
 							cout << "<br><br>" << endl;	
 						} 
 						else 
-							cout << "<div class=\"column\" draggable=\"false\"><header>"<<temp[b][c].kodekuliah<<"</header></div>" << endl;
+							cout << "<div class=\"column\" draggable=\"false\"><header style=\"background-color:" << colour << "\">" <<temp[b][c].kodekuliah<<"</header></div>" << endl;
 					}
 				} 
 				else {
 					for(int c = 0; c < 6; c++){
+						int colour = (temp[b][c].idkuliah)*16384;
 						if(c == 0){
-							cout << "<div class=\"column\" draggable=\"false\"><header>"<<temp[b][c].kodekuliah<<"</header></div>" << endl;
+							cout << "<div class=\"column\" draggable=\"false\"><header style=\"background-color:" << colour << "\">" <<temp[b][c].kodekuliah<<"</header></div>" << endl;
 						} else if(c == 5){
-							cout << "<div class=\"column\" draggable=\"true\"><header>"<<temp[b][c].kodekuliah<<"</header></div>" << endl;
+							cout << "<div class=\"column\" draggable=\"true\"><header style=\"background-color:" << colour << "\">" <<temp[b][c].kodekuliah<<"</header></div>" << endl;
 							cout << "<br><br>" << endl;	
 						} 
 						else 
-							cout << "<div class=\"column\" draggable=\"true\"><header>"<<temp[b][c].kodekuliah<<"</header></div>" << endl;
+							cout << "<div class=\"column\" draggable=\"true\"><header style=\"background-color:" << colour << "\">" <<temp[b][c].kodekuliah<<"</header></div>" << endl;
 					}
 				}
 			}
 		}
 		// buat bentrok
 		cout << "<h3 class=\"schedule\">Bentrok</h3>" << endl;
+		cout << "Jumlah Bentrok " << n.countConflictCourses() << endl;
 		if(bentrokIterator >= 1){
 			for(int d = 0; d < bentrokIterator; d++){
 				cout << "<div class=\"column\" draggable=\"true\"><header>"<<arrBentrok[d].kodekuliah<<"</header></div>" << endl;

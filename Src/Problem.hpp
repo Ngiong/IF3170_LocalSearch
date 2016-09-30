@@ -452,10 +452,10 @@ void Problem::solveUsingKocokan(int maxSteps) {
 	// isSolved() OR stepCounter >= maxSteps
 	if(stepCounter < maxSteps) cout << "YAY" << endl;
 	else cout << "NAH" << endl;
-
+	/*
 	for(int i=0; i<nCourses; i++) {
 		cout << *course[i] << endl;
-	}
+	}*/
 }
 
 Problem Problem::modifySolution(Problem P) {

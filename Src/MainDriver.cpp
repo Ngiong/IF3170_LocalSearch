@@ -36,10 +36,6 @@ int main()
 	if (Get.find("algo")!=Get.end() && Get.find("userfile")!=Get.end()) {
 		string file = Get["userfile"];
 		file = "../tc/" + file;
-		// Buat testing
-		/*
-		cout<<"<p>File path that you loaded   : "<<file<<"</p>"<<endl;
-		cout<<"<p>Algorithm that you selected : "<<Get["algo"]<<"</p>"<<endl;*/
 		Problem n(file);
 		if(Get["algo"] == "HillClimbing"){
 			n.solveUsingHill(10);
@@ -54,6 +50,7 @@ int main()
 		cout << "<h2 class=\"schedule\">Result</h2>" << endl;
 		cout << "<br><br>" << endl;
 		int T = n.getNRoom();
+		
 		// ini buat nampung bentrok nya
 		Hasil arrBentrok[n.getNCourse()];
 		int bentrokIterator = 0;
@@ -157,24 +154,46 @@ int main()
 						k = 4;
 					else
 						k = 5;
-					if(temp[n.getKuliah(j).getCurrentStartTime()-6][k].kodekuliah == "-")
+						
+					if(temp[n.getKuliah(j).getCurrentStartTime()-6][k].kodekuliah == "-"){
+						// check duration
 						temp[n.getKuliah(j).getCurrentStartTime()-6][k].kodekuliah = n.getKuliah(j).getKode();
-					else {
-						arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
-						bentrokIterator++;
-					}
-					// check duration
-					if(n.getKuliah(j).getDuration() > 1) {
-						int duration = n.getKuliah(j).getDuration();
-						duration -= 1;
-						for(int a = n.getKuliah(j).getCurrentStartTime()-6; a <= n.getKuliah(j).getCurrentStartTime()-6 + duration; a++){
-							temp[a][k].kodekuliah = n.getKuliah(j).getKode();
-							temp[a][k].idkuliah = j+1;
+						if(n.getKuliah(j).getDuration() > 1) {
+							int duration = n.getKuliah(j).getDuration();
+							duration -= 1;
+							for(int a = n.getKuliah(j).getCurrentStartTime()-6; a <= n.getKuliah(j).getCurrentStartTime()-6 + duration; a++){
+								if(temp[a][k].kodekuliah == "-" || temp[a][k].kodekuliah == n.getKuliah(j).getKode()){
+									temp[a][k].kodekuliah = n.getKuliah(j).getKode();
+									temp[a][k].idkuliah = j+1;
+								} else {
+									arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
+									bentrokIterator++;
+								}
+							}
+						}
+						else
+						{
+							temp[n.getKuliah(j).getCurrentStartTime()-6][k].idkuliah = j+1;
 						}
 					}
-					else
-					{
-						temp[n.getKuliah(j).getCurrentStartTime()-6][k].idkuliah = j+1;
+					else {
+						int Bentrokduration = n.getKuliah(j).getDuration();
+						if(Bentrokduration > 1){
+							Bentrokduration -= 1;
+							for(int a = n.getKuliah(j).getCurrentStartTime()-6; a <= n.getKuliah(j).getCurrentStartTime()-6 + Bentrokduration; a++){
+								if(temp[a][k].kodekuliah != "-" && temp[a][k].kodekuliah != n.getKuliah(j).getKode()){	
+									arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
+									bentrokIterator++;
+								} else {
+									temp[a][k].kodekuliah = n.getKuliah(j).getKode();
+									temp[a][k].idkuliah = j+1; 
+								}
+							}
+						}
+						else {
+							arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
+							bentrokIterator++;
+						}
 					}
 				}
 			}
@@ -210,6 +229,7 @@ int main()
 		// buat bentrok
 		cout << "<h3 class=\"schedule\">Bentrok</h3>" << endl;
 		cout << "Jumlah Bentrok " << n.countConflictCourses() << endl;
+		cout << "<br><br>" << endl;
 		if(bentrokIterator >= 1){
 			for(int d = 0; d < bentrokIterator; d++){
 				cout << "<div class=\"column\" draggable=\"true\"><header>"<<arrBentrok[d].kodekuliah<<"</header></div>" << endl;

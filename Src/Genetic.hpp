@@ -16,6 +16,10 @@ class Genetic {
     private :
         Ruang ** rooms;
         Kuliah ** courses;
+
+        int**** slotTable;
+        int* slotCountTable;
+
         string * solutionSample;
         int nRuang;
         int nKuliah;
@@ -69,6 +73,33 @@ Genetic :: Genetic(Ruang** room, Kuliah** course, int n, int nrooms, int ncourse
     solutionSample = new string[nSample];
     R = new RandomGenerator();
     bestConflict = nRuang*nKuliah*N_DAY*N_TIME;
+
+    slotTable = new int***[nKuliah];
+    slotCountTable = new int[nKuliah];
+
+    for (int i = 0; i < nKuliah; i++) {
+        slotCountTable[i] = 0;
+        slotTable[i] = new int**[nRuang];
+        for (int r = 0; r < nRuang; r++) {
+            slotTable[i][r] = new int*[N_DAY];
+            for (int d = 0; d < N_DAY; d++) {
+                slotTable[i][r][d] = new int[N_TIME];
+                for (int t = 0; t < N_TIME; t++) {
+                    if ((courses[i] -> getButuhRuang() == "-" || courses[i] -> getButuhRuang() == rooms[r] -> getName())
+                          && courses[i] -> isDayAvail(d+DELTA_DAY)
+                          && rooms[r] -> isDayAvail(d+DELTA_DAY)
+                          && courses[i] -> isTimeAvail(t + DELTA_TIME, t + DELTA_TIME + courses[i] -> getDuration())
+                          && rooms[r] -> isTimeAvail(t + DELTA_TIME, t + DELTA_TIME + courses[i] -> getDuration())){
+
+                        slotTable[i][r][d][t] = 1;
+                    } else {
+                        slotTable[i][r][d][t] = 0;
+                    }
+                    slotCountTable[i] += slotTable[i][r][d][t];
+                }
+            }
+        }
+    }
 }
 
 Genetic :: ~Genetic() {
@@ -93,7 +124,7 @@ int Genetic :: getEndTime(string schedule, int courseID) {
 }
 
 int Genetic :: nSlotConflict(string schedule, int room, int day, int time) {
-    int conflictCount = -1;
+    int conflictCount = 0;
     for (int i = 0; i < nKuliah; i++) {
         if ((int) getRoom(schedule, i) == room
                 && getDay(schedule, i) == day
@@ -106,25 +137,40 @@ int Genetic :: nSlotConflict(string schedule, int room, int day, int time) {
 }
 
 int Genetic :: nCourseConflict(string schedule, int courseID) {
-    int conflictCount = 0;
-    for ( int i = getStartTime(schedule, courseID) ; i<=getEndTime(schedule, courseID); i++){
-        conflictCount += nSlotConflict(schedule, getRoom(schedule, courseID), getDay(schedule, courseID), i);
-    }
-    return conflictCount;
-}
-
-int Genetic :: nScheduleConflict(string schedule) {
-    int conflictCount = 0;
-    for (int i = 0; i < nRuang; i++) {
-        for (int j = 0; j < N_DAY; j++) {
-            for (int k = 0; k < N_TIME; k++) {
-                if (nSlotConflict(schedule, i, j, k) > 0) {
-                    conflictCount += nSlotConflict(schedule, i, j, k);
+    int count = 0;
+	for(int i=0; i<nKuliah; i++) {
+        if(getRoom(schedule,courseID) == getRoom(schedule, i)) {
+            if(getDay(schedule, courseID) == getDay(schedule, i)) {
+                int maks, minim;
+                maks = max(getStartTime(schedule,courseID), getStartTime(schedule, i));
+                minim = min(getStartTime(schedule,courseID) + courses[courseID]->getDuration(),
+                            getStartTime(schedule,i) + courses[i]->getDuration());
+                if(maks <= minim) {
+                    count += minim - maks;
                 }
             }
         }
+	}
+	return count - courses[courseID] -> getDuration();
+}
+
+int Genetic :: nScheduleConflict(string schedule) {
+    int sum = 0;
+    int count = 0;
+    for (int r = 0; r <nRuang;r++) {
+        for (int d = 0; d<N_DAY;d++) {
+            for (int t = 0; t<N_TIME;t++) {
+                count = 0;
+                for (int i = 0; i < nKuliah; i++) {
+                    if(getRoom(schedule, i) == r && getDay(schedule, i) == d && getStartTime(schedule, i) <= t && getEndTime(schedule,i) >= t) {
+                        count++;
+                    }
+                }
+                sum += count*(count-1)/2;
+            }
+        }
     }
-    return conflictCount;
+    return sum;
 }
 
 string Genetic :: randString() {
@@ -132,32 +178,14 @@ string Genetic :: randString() {
     int slotSpace[nRuang][N_DAY][N_TIME];
     int slotCount;
     for (int i = 0; i < nKuliah; i++) {
-        slotCount = 0;
-        for (int r = 0; r < nRuang; r++) {
-            for (int d = 0; d < N_DAY; d++) {
-                for (int t = 0; t < N_TIME; t++) {
-                    if ((courses[i] -> getButuhRuang() == "-" || courses[i] -> getButuhRuang() == rooms[r] -> getName())
-                          && courses[i] -> isDayAvail(d+DELTA_DAY)
-                          && rooms[r] -> isDayAvail(d+DELTA_DAY)
-                          && courses[i] -> isTimeAvail(t + DELTA_TIME, t + DELTA_TIME + courses[i] -> getDuration())
-                          && rooms[r] -> isTimeAvail(t + DELTA_TIME, t + DELTA_TIME + courses[i] -> getDuration())){
 
-                        slotSpace[r][d][t] = 1;
-                    } else {
-                        slotSpace[r][d][t] = 0;
-                    }
-                    slotCount+= slotSpace[r][d][t];
-                }
-            }
-        }
-
-        int temp = R -> nextInt(slotCount);
+        int temp = R -> nextInt(slotCountTable[i]);
         int sum = 0;
         int r, d, t;
         for (r = 0 ; sum <= temp && r < nRuang; r++) {
             for (d = 0; sum <= temp && d < N_DAY; d++) {
                 for (t = 0;sum <= temp && t < N_TIME; t++) {
-                    sum += slotSpace[r][d][t];
+                    sum += slotTable[i][r][d][t];
                 }
             }
         }
@@ -194,19 +222,17 @@ void Genetic :: geneticInit() {
 }
 
 int Genetic :: fitnessFunc(string schedule) {
-    int sum = 0;
-    for (int r = 0; r < nRuang; r++) {
-        for (int d = 0; d < N_DAY; d++) {
-            for ( int t = 0; t < N_TIME; t++) {
-                if (nSlotConflict(schedule, r, d, t) >= 0) {
-                    int temp = SLOTFITNESSMAX - nSlotConflict(schedule, r, d, t);
-                    if (temp > 0) {
-                        sum += temp;
-                    }
-                }
-            }
+
+    int sum= 0;
+    for(int i = 0; i < nKuliah; i++) {
+        int temp = SLOTFITNESSMAX - nCourseConflict(schedule, i);
+        if (temp <=0) {
+            sum += 0;
+        } else {
+            sum += temp;
         }
     }
+
     return sum;
 }
 
@@ -268,10 +294,10 @@ void Genetic :: pairString(int* pairTable) {
 
 void Genetic :: cross(string* s, int s1, int s2) {
     int crossTable[nKuliah];
-
+    int totalconflict = nScheduleConflict(s[s1]) + nScheduleConflict(s[s2]);
     for(int i = 0; i < nKuliah; i++) {
-        if (nScheduleConflict(s[s1]) + nScheduleConflict(s[s2]) != 0) {
-            int temp = R -> nextInt(nScheduleConflict(s[s1]) + nScheduleConflict(s[s2]));
+        if (totalconflict != 0) {
+            int temp = R -> nextInt(totalconflict);
             if (temp < nCourseConflict(s[s1], i) + nCourseConflict(s[s2],i)) {
                 crossTable[i] = 1;
             } else {
@@ -325,35 +351,18 @@ void Genetic :: geneticCrossover() {
 void Genetic :: mutateString(string* schedule) {
 
     char mutateTable[nKuliah][4];
-    int slotSpace[nRuang][N_DAY][N_TIME];
-    if ((nScheduleConflict(*schedule)) != 0) {
+    int totalconflict = nScheduleConflict(*schedule);
+    if (totalconflict != 0) {
         for(int i = 0; i < nKuliah; i++){
-            int temp = R -> nextInt(nScheduleConflict(*schedule));
-            int slotCount = 0;
+            int temp = R -> nextInt(totalconflict);
             if (temp < nCourseConflict(*schedule, i)) {
-                for (int r = 0; r < nRuang; r++) {
-                    for (int d = 0; d < N_DAY; d++) {
-                        for (int t = 0; t < N_TIME; t++) {
-                            if ((courses[i] -> getButuhRuang() == "-" || courses[i] -> getButuhRuang() == rooms[r] -> getName())
-                                  && courses[i] -> isDayAvail(d+DELTA_DAY)
-                                  && rooms[r] -> isDayAvail(d+DELTA_DAY)
-                                  && courses[i] -> isTimeAvail(t + DELTA_TIME, t + DELTA_TIME + courses[i] -> getDuration())
-                                  && rooms[r] -> isTimeAvail(t + DELTA_TIME, t + DELTA_TIME + courses[i] -> getDuration())){
-                                slotCount++;
-                                slotSpace[r][d][t] = 1;
-                            } else {
-                                slotSpace[r][d][t] = 0;
-                            }
-                        }
-                    }
-                }
-                int temp2 = R -> nextInt(slotCount);
+                int temp2 = R -> nextInt(slotCountTable[i]);
                 int sum = 0;
                 int r, d, t;
                 for (r = 0 ; sum <= temp2 && r < nRuang; r++) {
                     for (d = 0 ; sum <= temp2 && d < N_DAY; d++) {
                         for (t = 0 ; sum <= temp2 && t < N_TIME; t++) {
-                            sum += slotSpace[r][d][t];
+                            sum += slotTable[i][r][d][t];
                         }
                     }
                 }
@@ -389,6 +398,7 @@ void Genetic :: eval() {
     int currentBestConflict;
     int currentBestIdx;
     int currentConflict;
+
     for (int i = 0; i < nSample; i++) {
         if (i == 0) {
             currentBestConflict = nScheduleConflict(solutionSample[i]);
@@ -401,6 +411,13 @@ void Genetic :: eval() {
             }
         }
     }
+
+    int sum1 = 0;
+    int sum2 = 0;
+    for (int i = 0; i < nKuliah; i++) {
+        sum1 += nCourseConflict(solutionSample[currentBestIdx], i);
+        sum2 += nCourseConflict(bestSolution, i);
+    }
     if (currentBestConflict < bestConflict) {
         bestSolution = solutionSample[currentBestIdx];
         bestConflict = currentBestConflict;
@@ -409,13 +426,25 @@ void Genetic :: eval() {
 
 
 void Genetic :: solveGA(int nCycle) {
+    //cout << "Init Start" << endl;
     geneticInit();
+    //cout << "Init End" << endl;
+    //cout << "Eval Start" << endl;
     eval();
+    //cout << "Eval End" << endl;
     for(int i = 0; i < nCycle && bestConflict != 0; i++) {
+        //cout << "Select " << i << " Start" << endl;
         geneticSelection();
+        //cout << "Select " << i << " End" << endl;
+        //cout << "Cross " << i << " Start" << endl;
         geneticCrossover();
+        //cout << "Cross " << i << " End" << endl;
+        //cout << "Mutate " << i << " Start" << endl;
         geneticMutation();
+        //cout << "Mutate " << i << " End" << endl;
+        //cout << "Eval " << i << " Start" << endl;
         eval();
+        //cout << "Eval " << i << " End" << endl;
     }
 
     int best, bestIdx;

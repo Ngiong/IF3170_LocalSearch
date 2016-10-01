@@ -45,7 +45,7 @@ int main()
 		file = "../tc/" + file;
 		Problem n(file);
 		if(Get["algo"] == "HillClimbing"){
-			n.solveUsingHill(10);
+			n.solveUsingHill(300);
 		} else if(Get["algo"] == "SimulatedAnnealing"){
 			// n.solveUsingSA(1, 0.01, 10, 120);
 			n.solveUsingSA(10, 0.004, 35, 2600);

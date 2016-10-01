@@ -331,7 +331,7 @@ void Problem::initByRandom() {
 **********************************************/
 void Problem::solveUsingHill(int maxRestart) {
 	int stepCounter, boundLocal, countRestart = 0, minConflict = 999;
-	Problem tempSolution = *this;
+	Problem tempSolution;
 	Problem minimum;
 	int tempEvalValue, newEvalValue;
 	bool isLocalMinimum;
@@ -339,6 +339,7 @@ void Problem::solveUsingHill(int maxRestart) {
 
 	do {
 		initByRandom();
+		tempSolution = *this;
 		stepCounter = 0;
 		boundLocal = 0;
 		tempEvalValue = countConflictCourses();
@@ -360,7 +361,7 @@ void Problem::solveUsingHill(int maxRestart) {
 				}
 			}
 		}
-		cout << countRestart << " " << countConflictCourses() << " " << minConflict << endl;
+		cout << "---" << countRestart << " " << countConflictCourses() << " " << minConflict << "---" << endl;
 		countRestart++;
 		if (countConflictCourses() < minConflict) {
 			minConflict = countConflictCourses();

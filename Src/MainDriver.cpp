@@ -11,6 +11,13 @@ typedef struct {
 	int jamselesai;
 	int idkuliah;
 } Hasil;
+
+typedef struct{
+	string kodekuliah;
+	string room;
+	int jambentrok;
+	int hari;	
+}Bentrok;
  
 int main()
 {
@@ -52,7 +59,7 @@ int main()
 		int T = n.getNRoom();
 		
 		// ini buat nampung bentrok nya
-		Hasil arrBentrok[n.getNCourse()];
+		Bentrok arrBentrok[n.getNCourse()];
 		int bentrokIterator = 0;
 		 
 		for(int i = 0; i < T; i++){
@@ -169,6 +176,10 @@ int main()
 									countFill += 1;
 								} else {
 									arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
+									arrBentrok[bentrokIterator].hari = k;
+									arrBentrok[bentrokIterator].jambentrok = a;
+									arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
+									arrBentrok[bentrokIterator].room = RoomName;
 									bentrokIterator++;
 								}
 							}
@@ -185,6 +196,10 @@ int main()
 							for(int a = n.getKuliah(j).getCurrentStartTime()-6; a <= n.getKuliah(j).getCurrentStartTime()-6 + Bentrokduration; a++){
 								if(temp[a][k].kodekuliah != "-" && temp[a][k].kodekuliah != n.getKuliah(j).getKode()){	
 									arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
+									arrBentrok[bentrokIterator].hari = k;
+									arrBentrok[bentrokIterator].jambentrok = a;
+									arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
+									arrBentrok[bentrokIterator].room = RoomName;
 									bentrokIterator++;
 								} else {
 									temp[a][k].kodekuliah = n.getKuliah(j).getKode();
@@ -195,6 +210,10 @@ int main()
 						}
 						else {
 							arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
+							arrBentrok[bentrokIterator].hari = k;
+							arrBentrok[bentrokIterator].jambentrok = n.getKuliah(j).getCurrentStartTime()-6;
+							arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
+							arrBentrok[bentrokIterator].room = RoomName;
 							bentrokIterator++;
 						}
 					}
@@ -240,7 +259,17 @@ int main()
 			for(int d = 0; d < bentrokIterator; d++){
 				cout << "<div class=\"column\" draggable=\"true\"><header>"<<arrBentrok[d].kodekuliah<<"</header></div>" << endl;
 			}
-		} else cout << "<p>Tidak ada Bentrok pada Jadwal</p>" << endl;
+			cout << "<br><br>" << endl;
+			cout << "<h3 class=\"schedule\">Detail Bentrok</h3>" << endl;
+			cout << "<h4>Berikut detail bentrok dari hasil solver : </h4>" << endl;
+			cout << "<div style=\"border: 5px solid red;border-radius: 3px;text-align: center;\">" << endl;
+			for(int d = 0; d < bentrokIterator; d++){
+				cout <<"<b>"<< arrBentrok[d].kodekuliah << "</b> pada ruang " <<"<b>"<< arrBentrok[d].room << "</b> di hari ke- " <<"<b>"<<arrBentrok[d].hari << "</b> pada jam : "<<"<b>"<<arrBentrok[d].jambentrok <<"</b>"<<endl;
+				cout << "<br>" << endl;
+			}
+			cout << "</div>" << endl;
+		} 
+		else cout << "<p>Tidak ada Bentrok pada Jadwal</p>" << endl;
 		
 		cout << "<script src=\"drag.js\" type=\"text/javascript\"></script>" << endl;
 	} 

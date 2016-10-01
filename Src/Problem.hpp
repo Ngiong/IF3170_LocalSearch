@@ -352,7 +352,7 @@ void Problem::solveUsingHill(int maxRestart) {
 				stepCounter++;
 			}
 			else {
-				if (boundLocal <= 3333) {
+				if (boundLocal <= 500) {
 					boundLocal++;
 				}
 				else {
@@ -360,7 +360,7 @@ void Problem::solveUsingHill(int maxRestart) {
 				}
 			}
 		}
-		//cout << countRestart << " " << countConflictCourses() << " " << minConflict << endl;
+		cout << countRestart << " " << countConflictCourses() << " " << minConflict << endl;
 		countRestart++;
 		if (countConflictCourses() < minConflict) {
 			minConflict = countConflictCourses();

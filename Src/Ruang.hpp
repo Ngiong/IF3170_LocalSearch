@@ -20,6 +20,14 @@ class Ruang {
 		bool isTimeAvail(int b, int e) {
 			return (startHours <= b && b <= endHours && startHours <= e && e <= endHours);
 		}
+		int getAvailableDuration(){
+			int count = 0;
+			for(int i = 1; i <= 5; i++){
+				if(isDayAvail(i))
+					count+=1;
+			}
+			return ((getEndHours() - getStartHours()) * count);
+		}
 		
 		// member function
 		bool isAvailable(int day, int b, int e) { return isDayAvail(day) && isTimeAvail(b, e); }
@@ -29,8 +37,7 @@ class Ruang {
 		int ruangId;
 		string ruangName;
 		int startHours, endHours;
-		bool availDays[8];
-			
+		bool availDays[8];	
 };
 
 // Implementasi member function

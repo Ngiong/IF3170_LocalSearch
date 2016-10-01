@@ -59,6 +59,7 @@ int main()
 			string RoomName = n.getRuang(i).getName();			
 			cout << "<h3 class=\"schedule\">" << RoomName << "</h3>" << endl;
 			Hasil temp[12][6];
+			int countFill = 0;
 			cout << "<div id = \"columns\"> " << endl;
 			
 			//init array penampung
@@ -165,6 +166,7 @@ int main()
 								if(temp[a][k].kodekuliah == "-" || temp[a][k].kodekuliah == n.getKuliah(j).getKode()){
 									temp[a][k].kodekuliah = n.getKuliah(j).getKode();
 									temp[a][k].idkuliah = j+1;
+									countFill += 1;
 								} else {
 									arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
 									bentrokIterator++;
@@ -186,6 +188,7 @@ int main()
 									bentrokIterator++;
 								} else {
 									temp[a][k].kodekuliah = n.getKuliah(j).getKode();
+									countFill += 1;
 									temp[a][k].idkuliah = j+1; 
 								}
 							}
@@ -225,6 +228,9 @@ int main()
 					}
 				}
 			}
+			cout << "<br>" << endl;
+			cout << "<p><b>Persen keefektifan ruangan ini = " << (float)((countFill * 100) / n.getRuang(i).getAvailableDuration())<< "%</b></p>" << endl;
+			cout << "<br>" << endl;
 		}
 		// buat bentrok
 		cout << "<h3 class=\"schedule\">Bentrok</h3>" << endl;

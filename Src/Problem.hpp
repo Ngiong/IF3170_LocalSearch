@@ -150,7 +150,7 @@ Problem::Problem(string file) {
 				}
  				j++;
 			}
-			//cout << ruangan << " " << startTime << " " << finishTime << " " << isSenin << " " << isSelasa << " " << isRabu << " " << isKamis << " " << isJumat << endl;
+			cout << ruangan << " " << startTime << " " << finishTime << " " << isSenin << " " << isSelasa << " " << isRabu << " " << isKamis << " " << isJumat << endl;
 			room[i] = new Ruang(ruangan, startTime, finishTime, isSenin, isSelasa, isRabu, isKamis, isJumat);
 		}
 
@@ -207,7 +207,7 @@ Problem::Problem(string file) {
  				j++;
 			}
 
-			//cout << jadwal << " " << ruangan << " " << startTime << " " << finishTime << " " << durasi << " " << isSenin << " " << isSelasa << " " << isRabu << " " << isKamis << " " << isJumat << endl;
+			cout << jadwal << " " << ruangan << " " << startTime << " " << finishTime << " " << durasi << " " << isSenin << " " << isSelasa << " " << isRabu << " " << isKamis << " " << isJumat << endl;
 			course[i] = new Kuliah(jadwal, ruangan, startTime, finishTime, durasi, isSenin, isSelasa, isRabu, isKamis, isJumat);
 		}
 		myfile.close();

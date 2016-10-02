@@ -308,6 +308,7 @@ int main()
 		else cout << "<p>Tidak ada Bentrok pada Jadwal</p>" << endl;
 		
 		cout << "<script src=\"drag.js\" type=\"text/javascript\"></script>" << endl;
+
 	} 
 	cout<<"</body>"<<endl;
 	cout<<"</html>"<<endl;

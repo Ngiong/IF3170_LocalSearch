@@ -32,6 +32,8 @@ class Problem {
 		// Performance Measure
 		bool isSolved();
 		int countConflictCourses();
+		int getAvailableDuration(string);	
+		
 		Ruang& getRuang(int i){
 			return *room[i];
 		}
@@ -533,4 +535,20 @@ int Problem::countConflictCourses() {
 	}
 	return count;
 }
+
+int Problem::getAvailableDuration(string NamaRuang){
+	int sum = 0;
+	for(int i = 0; i<nRooms; i++)
+	{
+		int count = 0;
+		if(NamaRuang == room[i]->ruangName) {
+			for(int j = 1; j <= 5; j++){
+				if(room[i]->isDayAvail(j))
+					count+=1;
+			}
+		}
+		sum += (room[i]->getEndHours() - room[i]->getStartHours()) * count;
+	}
+	return sum;
+}	
 #endif

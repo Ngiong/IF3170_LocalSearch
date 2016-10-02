@@ -280,12 +280,19 @@ int main()
 			// buat bentrok
 			cout << "<h3 class=\"schedule\">Bentrok</h3>" << endl;
 			cout << "Jumlah Bentrok " << n.countConflictCourses() << endl;
-			cout << "<br><br>" << endl;
+			cout << "<br></br>" << endl;
+			cout << "Jumlah matkul masuk ke jadwal tapi tidak terlihat (keterbatasan GUI) :  " << bentrokIterator << endl;
+			cout << "<br>" << endl;
 			if(bentrokIterator >= 1){
 				for(int d = 0; d < bentrokIterator; d++){
 					int colour = arrBentrok[d].idkuliah*COLOUR_CONST;
 					cout << "<div class=\"column\" draggable=\"true\"><header style=\"background-color:" << colour << "\">"<<arrBentrok[d].kodekuliah<<"</header></div>" << endl;
+					if(d % 5 == 0 && d != 0)
+						cout << "<br>" << endl;
+					if(d == bentrokIterator-1)
+						cout << "<br><br>" << endl;
 				}
+				
 				cout << "<br><br>" << endl;
 				cout << "<h3 class=\"schedule\">Detail Bentrok</h3>" << endl;
 				cout << "<h4>Berikut detail bentrok dari hasil solver : </h4>" << endl;

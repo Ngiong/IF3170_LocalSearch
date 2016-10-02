@@ -6,6 +6,7 @@
 using namespace std;
 
 #define COLOUR_CONST 4096
+#define BENTROK_MAX 4096
 
 typedef struct {
 	string kodekuliah;
@@ -83,7 +84,7 @@ int main()
 		int T = n.getNRoom();
 		
 		// ini buat nampung bentrok nya
-		Bentrok arrBentrok[n.getNCourse()];
+		Bentrok arrBentrok[BENTROK_MAX];
 		int bentrokIterator = 0;
 		
 		map<string,int> mapRoomName;

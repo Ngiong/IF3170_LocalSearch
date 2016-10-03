@@ -2,7 +2,7 @@
 #include <map>
 #include "getpost.h"
 #include "Problem.hpp"
- 
+
 using namespace std;
 
 #define COLOUR_CONST 4096
@@ -20,9 +20,9 @@ typedef struct{
 	string room;
 	int jambentrok;
 	int hari;
-	int idkuliah;	
+	int idkuliah;
 }Bentrok;
- 
+
 int main()
 {
 	map<string,string> Get;
@@ -45,13 +45,15 @@ int main()
 	cout << "Maintain Temperature Attempts for Simulated Annealing (default : 35) : <input type = \"text\" name = \"maintainAttempts\"><br>" << endl;
 	cout << "Maximum Iteration for Simulated Annealing (default : 2600)           : <input type = \"text\" name = \"maxIter\"><br><br>" << endl;
 	cout << "<input type = \"radio\" name = \"algo\" value = \"GeneticAlgorithm\"> Genetic Algorithm <br><br>" << endl;
+	cout << "Number of selection sample picked for Genetic Algorithm  (default : 64)            : <input type = \"text\" name = \"nSample\"><br>" << endl;
+	cout << "Maximum cycle (selection-crossover-mutation) for Genetic Algorithm (default : 100) : <input type = \"text\" name = \"nCycle\"><br><br>" << endl;
 	cout << "<p>Browse File: <input type=\"file\" name=\"userfile\" /></p>"<<endl;
 	cout<<"<input type=\"submit\" value=\"Solve\" style=\"background-color: #0080ff;border: none;color: white;padding: 10px 27px;text-align: center;text-decoration: none;display: inline-block;font-size: 14px;margin: 4px 2px;cursor: pointer;\" />"<<endl;
 	cout<<"</form>"<<endl;
 
  	if(Get.find("algo")==Get.end() || Get.find("userfile")==Get.end()){
 		cout <<"<p style=\"font-family: Arial;\"><b>Fill up the form above and press solve<b></p>" <<endl;
-	} 
+	}
 	else {
 		string file = Get["userfile"];
 		file = "../tc/" + file;
@@ -63,7 +65,7 @@ int main()
 			else {
 				n.solveUsingHill(100);
 			}
-		} 
+		}
 		else if(Get["algo"] == "SimulatedAnnealing"){
 			// n.solveUsingSA(1, 0.01, 10, 120);
 			// n.solveUsingSA(10, 0.004, 35, 2600);
@@ -72,37 +74,50 @@ int main()
 			}
 			else {
 				n.solveUsingSA(stof(Get["temperature"]), stof(Get["descentRate"]), stoi(Get["maintainAttempts"]), stoi(Get["maxIter"]));
-			}	
-		} 
+			}
+		}
 		else {
-			n.solveUsingGA(64, 100);	
-		} 
-		
+		    int nSample = 64;
+            int nCycle = 100;
+            if (Get["nSample"] != "") {
+                int temp = (stoi(Get["nSample"]) + 1)/2;
+                if(temp > 0) {
+                    nSample = 2*temp;
+                }
+			}
+			if (Get["nCycle"] != "") {
+				int temp = stoi(Get["nCycle"]);
+				if(temp > 0) {
+                    nCycle = temp;
+                }
+			}
+			n.solveUsingGA(nSample, nCycle);
+		}
+
 		cout << "<br>" << endl;
 		cout << "<h2 class=\"schedule\">Result</h2>" << endl;
 		cout << "<br><br>" << endl;
 		int T = n.getNRoom();
-		
+
 		// ini buat nampung bentrok nya
 		Bentrok arrBentrok[BENTROK_MAX];
 		int bentrokIterator = 0;
-		
+
 		map<string,int> mapRoomName;
-		int countTotal = 0;
-		int durTotal = 0; 
+
 		for(int i = 0; i < T; i++) {
-			string RoomName = n.getRuang(i).getName();	
-			
+			string RoomName = n.getRuang(i).getName();
+
 			if(mapRoomName.count(RoomName)!=0) {
 				// do nothing
 			}
 			else {
-				mapRoomName[RoomName] = 1;		
+				mapRoomName[RoomName] = 1;
 				cout << "<h3 class=\"schedule\">" << RoomName << "</h3>" << endl;
 				Hasil temp[12][6];
 				int countFill = 0;
 				cout << "<div id = \"columns\"> " << endl;
-				
+
 				//init array penampung
 				temp[0][0].kodekuliah = "Jam / Hari";
 				temp[0][0].jammulai = 0;
@@ -128,7 +143,7 @@ int main()
 				temp[0][5].jammulai = 0;
 				temp[0][5].jamselesai = 0;
 				temp[0][5].idkuliah = 0;
-				
+
 				temp[1][0].kodekuliah = "07.00";
 				temp[1][0].jammulai = 0;
 				temp[1][0].jamselesai = 0;
@@ -181,7 +196,7 @@ int main()
 						temp[i][j].idkuliah = 0;
 					}
 				}
-				
+
 				// mulai baca setiap mata kuliah
 				for(int j = 0; j < n.getNCourse(); j++){
 					if(n.getKuliah(j).getCurrentRuang() == RoomName){
@@ -196,7 +211,7 @@ int main()
 							k = 4;
 						else
 							k = 5;
-							
+
 						if(temp[n.getKuliah(j).getCurrentStartTime()-6][k].kodekuliah == "-"){
 							// check duration
 							temp[n.getKuliah(j).getCurrentStartTime()-6][k].kodekuliah = n.getKuliah(j).getKode();
@@ -229,7 +244,7 @@ int main()
 							if(Bentrokduration > 1){
 								Bentrokduration -= 1;
 								for(int a = n.getKuliah(j).getCurrentStartTime()-6; a <= n.getKuliah(j).getCurrentStartTime()-6 + Bentrokduration; a++){
-									if(temp[a][k].kodekuliah != "-" && temp[a][k].kodekuliah != n.getKuliah(j).getKode()){	
+									if(temp[a][k].kodekuliah != "-" && temp[a][k].kodekuliah != n.getKuliah(j).getKode()){
 										arrBentrok[bentrokIterator].kodekuliah = n.getKuliah(j).getKode();
 										arrBentrok[bentrokIterator].hari = k;
 										arrBentrok[bentrokIterator].jambentrok = a;
@@ -239,7 +254,7 @@ int main()
 									} else {
 										temp[a][k].kodekuliah = n.getKuliah(j).getKode();
 										countFill += 1;
-										temp[a][k].idkuliah = j+1; 
+										temp[a][k].idkuliah = j+1;
 									}
 								}
 							}
@@ -254,21 +269,20 @@ int main()
 						}
 					}
 				}
-				countTotal += countFill;
-				durTotal +=n.getAvailableDuration(RoomName);
-				// nge cout disini 
+
+				// nge cout disini
 				for(int b = 0; b < 12; b++){
 					if(b == 0){
 						for(int c = 0; c < 6; c++){
 							int colour = (temp[b][c].idkuliah)*COLOUR_CONST;
 							if(c == 5){
 								cout << "<div class=\"column\" draggable=\"false\"><header style=\"background-color:" << colour << "\">" <<temp[b][c].kodekuliah<<"</header></div>" << endl;
-								cout << "<br><br>" << endl;	
-							} 
-							else 
+								cout << "<br><br>" << endl;
+							}
+							else
 								cout << "<div class=\"column\" draggable=\"false\"><header style=\"background-color:" << colour << "\">" <<temp[b][c].kodekuliah<<"</header></div>" << endl;
 						}
-					} 
+					}
 					else {
 						for(int c = 0; c < 6; c++){
 							int colour = (temp[b][c].idkuliah)*COLOUR_CONST;
@@ -276,9 +290,9 @@ int main()
 								cout << "<div class=\"column\" draggable=\"false\"><header style=\"background-color:" << colour << "\">" <<temp[b][c].kodekuliah<<"</header></div>" << endl;
 							} else if(c == 5){
 								cout << "<div class=\"column\" draggable=\"true\"><header style=\"background-color:" << colour << "\">" <<temp[b][c].kodekuliah<<"</header></div>" << endl;
-								cout << "<br><br>" << endl;	
-							} 
-							else 
+								cout << "<br><br>" << endl;
+							}
+							else
 								cout << "<div class=\"column\" draggable=\"true\"><header style=\"background-color:" << colour << "\">" <<temp[b][c].kodekuliah<<"</header></div>" << endl;
 						}
 					}
@@ -301,7 +315,7 @@ int main()
 				if(d % 6 == 5 || d == bentrokIterator-1)
 					cout << "<br><br>" << endl;
 			}
-			
+
 			cout << "<br><br>" << endl;
 			cout << "<h3 class=\"schedule\">Detail Bentrok</h3>" << endl;
 			cout << "<h4>Berikut detail bentrok dari hasil solver : </h4>" << endl;
@@ -312,18 +326,14 @@ int main()
 				cout << "<br>" << endl;
 			}
 			cout << "</div>" << endl;
-		} 
+		}
 		else cout << "<p>Tidak ada Bentrok pada Jadwal</p>" << endl;
-		
-		cout << "<script src=\"drag.js\" type=\"text/javascript\"></script>" << endl;
-		
-		// buat keefektifitas total
-		cout << "<h3 class=\"schedule\">Efektifitas Total Semua Ruangan</h3>" << endl;
-		cout << "Jumlah efektitifas total semua ruangan" << "(" << countTotal << "/" << durTotal << ") = "  << (float)(countTotal*100)/durTotal << "%" << endl;
 
-	} 
+		cout << "<script src=\"drag.js\" type=\"text/javascript\"></script>" << endl;
+
+	}
 	cout<<"</body>"<<endl;
 	cout<<"</html>"<<endl;
- 
+
 	return 0;
 }

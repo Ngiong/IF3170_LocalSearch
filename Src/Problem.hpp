@@ -53,7 +53,11 @@ class Problem {
 		RandomGenerator rnd;
 };
 
-Problem::Problem() {}
+Problem::Problem() {
+	nRooms = 0; nCourses = 0;
+	room = new Ruang * [0];
+	course = new Kuliah * [0];
+}
 
 Problem::Problem(string file) {
 	string line;
@@ -300,6 +304,7 @@ void Problem::solveUsingHill(int maxRestart) {
 	Kuliah ** tempCourse = new Kuliah * [nCourses];
 
 	do {
+		cout << "-" << endl;
 		initByRandom();
 		tempSolution = *this;
 		stepCounter = 0;

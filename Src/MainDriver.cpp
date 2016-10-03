@@ -44,7 +44,7 @@ int main()
 	cout << "Descent Rate for Simulated Annealing (default : 0.004)               : <input type = \"text\" name = \"descentRate\"><br>" << endl;
 	cout << "Maintain Temperature Attempts for Simulated Annealing (default : 35) : <input type = \"text\" name = \"maintainAttempts\"><br>" << endl;
 	cout << "Maximum Iteration for Simulated Annealing (default : 2600)           : <input type = \"text\" name = \"maxIter\"><br><br>" << endl;
-	cout << "<input type = \"radio\" name = \"algo\" value = \"GeneticAlgorithm\"> Genetic Algorithm <br><br>" << endl;
+	cout << "<input type = \"radio\" name = \"algo\" value = \"GeneticAlgorithm\"> Genetic Algorithm <br>" << endl;
 	cout << "Number of selection sample picked for Genetic Algorithm  (default : 64)            : <input type = \"text\" name = \"nSample\"><br>" << endl;
 	cout << "Maximum cycle (selection-crossover-mutation) for Genetic Algorithm (default : 100) : <input type = \"text\" name = \"nCycle\"><br><br>" << endl;
 	cout << "<p>Browse File: <input type=\"file\" name=\"userfile\" /></p>"<<endl;

@@ -11,6 +11,7 @@ using namespace std;
 
 class RandomGenerator
 {
+
     public:
     	RandomGenerator();
         static RandomGenerator* getInstance() { return _instance; }

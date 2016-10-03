@@ -10,10 +10,10 @@
   -khtml-user-select: none;
   -webkit-user-select: none;
   user-select: none;
+  /* Required to make elements draggable in old WebKit */
   -khtml-user-drag: element;
   -webkit-user-drag: element;
 }
-
 .column {
   width: 200px;
   float: left;
@@ -30,7 +30,6 @@
   text-align: center;
   cursor: move;
 }
-
 .column header {
   color: #fff;
   text-shadow: #000 0 1px;

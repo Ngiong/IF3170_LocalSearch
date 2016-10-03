@@ -426,13 +426,25 @@ void Genetic :: eval() {
 
 
 void Genetic :: solveGA(int nCycle) {
+    //cout << "Init Start" << endl;
     geneticInit();
+    //cout << "Init End" << endl;
+    //cout << "Eval Start" << endl;
     eval();
+    //cout << "Eval End" << endl;
     for(int i = 0; i < nCycle && bestConflict != 0; i++) {
+        //cout << "Select " << i << " Start" << endl;
         geneticSelection();
+        //cout << "Select " << i << " End" << endl;
+        //cout << "Cross " << i << " Start" << endl;
         geneticCrossover();
+        //cout << "Cross " << i << " End" << endl;
+        //cout << "Mutate " << i << " Start" << endl;
         geneticMutation();
+        //cout << "Mutate " << i << " End" << endl;
+        //cout << "Eval " << i << " Start" << endl;
         eval();
+        //cout << "Eval " << i << " End" << endl;
     }
 
     int best, bestIdx;

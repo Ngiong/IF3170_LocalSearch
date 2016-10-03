@@ -26,7 +26,7 @@ typedef struct{
 int main()
 {
 	map<string,string> Get;
-	initializeGet(Get);
+	initializeGet(Get); //notice that the variable is passed by reference!
 	cout<<"Content-type: text/html"<<endl<<endl;
 	cout<<"<html>"<<endl;
 	cout<<"<head>"<<endl;
@@ -67,6 +67,8 @@ int main()
 			}
 		}
 		else if(Get["algo"] == "SimulatedAnnealing"){
+			// n.solveUsingSA(1, 0.01, 10, 120);
+			// n.solveUsingSA(10, 0.004, 35, 2600);
 			if (Get["temperature"] == "" || Get["descentRate"] == "" || Get["maintainAttempts"] == "" || Get["maxIter"] == "") {
 				n.solveUsingSA(1, 0.004, 35, 2600);
 			}
@@ -270,7 +272,7 @@ int main()
 				}
 				countTotal += countFill;
 				durTotal +=n.getAvailableDuration(RoomName);
-
+				// nge cout disini
 				for(int b = 0; b < 12; b++){
 					if(b == 0){
 						for(int c = 0; c < 6; c++){
@@ -302,7 +304,7 @@ int main()
 				cout << "<br>" << endl;
 			}
 		}
-		// buat bentrok
+			// buat bentrok
 		cout << "<h3 class=\"schedule\">Bentrok</h3>" << endl;
 		cout << "Jumlah Bentrok " << n.countConflictCourses() << endl;
 		cout << "<br></br>" << endl;
@@ -331,7 +333,7 @@ int main()
 
 		cout << "<script src=\"drag.js\" type=\"text/javascript\"></script>" << endl;
 		
-		// buat keefektifitasan total
+		// buat keefektifitas total
 		cout << "<h3 class=\"schedule\">Efektifitas Total Semua Ruangan</h3>" << endl;
 		cout << "Jumlah efektitifas total semua ruangan" << "(" << countTotal << "/" << durTotal << ") = "  << (float)(countTotal*100)/durTotal << "%" << endl;
 

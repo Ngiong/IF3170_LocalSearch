@@ -102,7 +102,8 @@ int main()
 		// ini buat nampung bentrok nya
 		Bentrok arrBentrok[BENTROK_MAX];
 		int bentrokIterator = 0;
-
+		int countTotal = 0;
+		int durTotal = 0; 
 		map<string,int> mapRoomName;
 
 		for(int i = 0; i < T; i++) {
@@ -269,7 +270,8 @@ int main()
 						}
 					}
 				}
-
+				countTotal += countFill;
+				durTotal +=n.getAvailableDuration(RoomName);
 				// nge cout disini
 				for(int b = 0; b < 12; b++){
 					if(b == 0){
@@ -330,6 +332,10 @@ int main()
 		else cout << "<p>Tidak ada Bentrok pada Jadwal</p>" << endl;
 
 		cout << "<script src=\"drag.js\" type=\"text/javascript\"></script>" << endl;
+		
+		// buat keefektifitas total
+		cout << "<h3 class=\"schedule\">Efektifitas Total Semua Ruangan</h3>" << endl;
+		cout << "Jumlah efektitifas total semua ruangan" << "(" << countTotal << "/" << durTotal << ") = "  << (float)(countTotal*100)/durTotal << "%" << endl;
 
 	}
 	cout<<"</body>"<<endl;

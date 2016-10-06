@@ -113,7 +113,7 @@ int main()
 			else {
 				mapRoomName[RoomName] = 1;
 				cout << "<h3 class=\"schedule\">" << RoomName << "</h3>" << endl;
-				Hasil temp[12][6];
+				Hasil temp[18][6];
 				int countFill = 0;
 				cout << "<div id = \"columns\"> " << endl;
 
@@ -187,7 +187,32 @@ int main()
 				temp[11][0].jammulai = 0;
 				temp[11][0].jamselesai = 0;
 				temp[11][0].idkuliah = 0;
-				for(int i = 1; i < 12; i++){
+				temp[12][0].kodekuliah = "18.00";
+				temp[12][0].jammulai = 0;
+				temp[12][0].jamselesai = 0;
+				temp[12][0].idkuliah = 0;
+				temp[13][0].kodekuliah = "19.00";
+				temp[13][0].jammulai = 0;
+				temp[13][0].jamselesai = 0;
+				temp[13][0].idkuliah = 0;
+				temp[14][0].kodekuliah = "20.00";
+				temp[14][0].jammulai = 0;
+				temp[14][0].jamselesai = 0;
+				temp[14][0].idkuliah = 0;
+				temp[15][0].kodekuliah = "21.00";
+				temp[15][0].jammulai = 0;
+				temp[15][0].jamselesai = 0;
+				temp[15][0].idkuliah = 0;
+				temp[16][0].kodekuliah = "22.00";
+				temp[16][0].jammulai = 0;
+				temp[16][0].jamselesai = 0;
+				temp[16][0].idkuliah = 0;
+				temp[17][0].kodekuliah = "23.00";
+				temp[17][0].jammulai = 0;
+				temp[17][0].jamselesai = 0;
+				temp[17][0].idkuliah = 0;
+				
+				for(int i = 1; i < 18; i++){
 					for(int j = 1; j < 6; j++){
 						temp[i][j].kodekuliah = "-";
 						temp[i][j].jammulai = 0;
@@ -271,7 +296,7 @@ int main()
 				countTotal += countFill;
 				durTotal +=n.getAvailableDuration(RoomName);
 
-				for(int b = 0; b < 12; b++){
+				for(int b = 0; b < 18; b++){
 					if(b == 0){
 						for(int c = 0; c < 6; c++){
 							int colour = (temp[b][c].idkuliah)*COLOUR_CONST;

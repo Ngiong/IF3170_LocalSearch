@@ -255,6 +255,7 @@ void Problem::initByRandom() {
 		// Set Waktu
 		int randomlyChosenRoomIdx;
 		int randomlyChosenDay, randomlyChosenStartTime;
+		cout << "a" << i << "<br>";
 		do {
 			// Set Ruangan
 			if(course[i]->isButuhRuang()) {
@@ -266,6 +267,7 @@ void Problem::initByRandom() {
 						k++;
 					}
 				}
+				cout << "b" << i << "<br>";
 				randomlyChosenRoomIdx = calonRuangId[rnd.nextInt(k)];
 			}
 			else {
@@ -276,6 +278,7 @@ void Problem::initByRandom() {
 
 			// * Set hari
 			do {
+				cout << "c" << i << "<br>";
 				randomlyChosenDay = rnd.nextInt(1, 5);
 			} while(!course[i]->isDayAvail(randomlyChosenDay));
 			course[i]->currentDay = randomlyChosenDay;
@@ -286,8 +289,11 @@ void Problem::initByRandom() {
 				courseDuration = course[i]->getDuration();
 			randomlyChosenStartTime = rnd.nextInt(courseBegin, courseEnd-courseDuration);
 			course[i]->currentStartTime = randomlyChosenStartTime;
-		} while (!room[randomlyChosenRoomIdx]->isTimeAvail(course[i]->currentStartTime, course[i]->currentStartTime + course[i]->duration)
-				|| !room[randomlyChosenRoomIdx]->isDayAvail(randomlyChosenDay));
+			
+		} while ((!room[randomlyChosenRoomIdx]->isTimeAvail(course[i]->currentStartTime, course[i]->currentStartTime + course[i]->duration)
+				|| !room[randomlyChosenRoomIdx]->isDayAvail(randomlyChosenDay)
+				)&& false);
+		cout << i << "<br>";
 	}
 }
 

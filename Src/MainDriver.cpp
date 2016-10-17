@@ -105,6 +105,7 @@ int main()
 		map<string,int> mapRoomName;
 
 		for(int i = 0; i < T; i++) {
+			if(n.matkulBuang.count(i)!=0) continue;
 			string RoomName = n.getRuang(i).getName();
 
 			if(mapRoomName.count(RoomName)!=0) {
@@ -359,8 +360,16 @@ int main()
 		// buat keefektifitasan total
 		cout << "<h3 class=\"schedule\">Efektifitas Total Semua Ruangan</h3>" << endl;
 		cout << "Jumlah efektitifas total semua ruangan" << "(" << countTotal << "/" << durTotal << ") = "  << (float)(countTotal*100)/durTotal << "%" << endl;
-
+		cout << "<br><br>" << endl;
+		for(int i = 0; i < T; i++) {
+		if(n.matkulBuang.count(i)!=0) {
+			cout << "Matkul Dibuang " << i << " " << n.getKuliah(i).getKode() << " " << n.getKuliah(i).getButuhRuang() << " " << n.getKuliah(i).getStartTime() << " " <<
+				n.getKuliah(i).getEndTime() << " " << n.getKuliah(i).getDuration() << " " << n.getKuliah(i).isDayAvail(1)
+				<< " " << n.getKuliah(i).isDayAvail(2) << " " << n.getKuliah(i).isDayAvail(3) << " " << n.getKuliah(i).isDayAvail(4) << " " << n.getKuliah(i).isDayAvail(5) << "<br>";		
+		}
 	}
+	}
+
 	cout<<"</body>"<<endl;
 	cout<<"</html>"<<endl;
 

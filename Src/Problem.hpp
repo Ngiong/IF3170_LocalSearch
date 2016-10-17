@@ -8,6 +8,8 @@
 #include "Genetic.hpp"
 using namespace std;
 
+#define MAXCARI 1000
+
 class Problem {
 	public :
 		Problem();
@@ -51,6 +53,9 @@ class Problem {
 		Ruang ** room;
 		Kuliah ** course;
 		RandomGenerator rnd;
+	
+	public :	
+		map<int,int> matkulBuang;
 };
 
 Problem::Problem() {
@@ -255,7 +260,8 @@ void Problem::initByRandom() {
 		// Set Waktu
 		int randomlyChosenRoomIdx;
 		int randomlyChosenDay, randomlyChosenStartTime;
-		cout << "a" << i << "<br>";
+//		cout << "a" << i << "<br>";
+		int count=0;
 		do {
 			// Set Ruangan
 			if(course[i]->isButuhRuang()) {
@@ -267,7 +273,7 @@ void Problem::initByRandom() {
 						k++;
 					}
 				}
-				cout << "b" << i << "<br>";
+//				cout << "b" << i << "<br>";
 				randomlyChosenRoomIdx = calonRuangId[rnd.nextInt(k)];
 			}
 			else {
@@ -278,7 +284,7 @@ void Problem::initByRandom() {
 
 			// * Set hari
 			do {
-				cout << "c" << i << "<br>";
+//				cout << "c" << i << "<br>";
 				randomlyChosenDay = rnd.nextInt(1, 5);
 			} while(!course[i]->isDayAvail(randomlyChosenDay));
 			course[i]->currentDay = randomlyChosenDay;
@@ -290,11 +296,21 @@ void Problem::initByRandom() {
 			randomlyChosenStartTime = rnd.nextInt(courseBegin, courseEnd-courseDuration);
 			course[i]->currentStartTime = randomlyChosenStartTime;
 			
-		} while ((!room[randomlyChosenRoomIdx]->isTimeAvail(course[i]->currentStartTime, course[i]->currentStartTime + course[i]->duration)
+			if(count>MAXCARI)
+			{
+		/*		cout << "Matkul Dibuang " << i << " " << course[i]->getKode() << " " << course[i]->getButuhRuang() << " " << course[i]->getStartTime() << " " <<
+					course[i]->getEndTime() << " " << course[i]->getDuration() << " " << course[i]->isDayAvail(1)
+					<< " " << course[i]->isDayAvail(2) << " " << course[i]->isDayAvail(3) << " " << course[i]->isDayAvail(4) << " " << course[i]->isDayAvail(5) << "<br>"; */
+				matkulBuang[i] = 1;
+				break;
+			}
+			count++;
+		} while (!room[randomlyChosenRoomIdx]->isTimeAvail(course[i]->currentStartTime, course[i]->currentStartTime + course[i]->duration)
 				|| !room[randomlyChosenRoomIdx]->isDayAvail(randomlyChosenDay)
-				)&& false);
-		cout << i << "<br>";
+				);
+	//	cout << i << "<br>";
 	}
+	cout << "DONE" << endl;
 }
 
 /*********************************************
@@ -381,7 +397,10 @@ void Problem :: solveUsingGA(int nSample, int nCycle) {
 }
 
 Problem Problem::modifySolution(Problem P) {
-	int randomlyChosenCourse = P.rnd.nextInt(nCourses);
+	int randomlyChosenCourse;
+	do {
+		randomlyChosenCourse = P.rnd.nextInt(nCourses);
+	} while(matkulBuang.count(randomlyChosenCourse)!=0);
 	int randomlyChosenRoomIdx;
 	int randomlyChosenDay, randomlyChosenStartTime;
 	do {
